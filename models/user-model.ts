@@ -1,4 +1,4 @@
-import {BaseModel, ModelService, UserModelService} from '..';
+import {BaseModel, ModelService, UserModelService, ProjectModelService, ProjectModel} from '..';
 import {Inject, Injectable} from "angular2/core";
 
 @Injectable()
@@ -7,7 +7,8 @@ export class UserModel extends BaseModel<UserModel> {
     return 'users';
   }
 
-  constructor(@Inject(UserModelService) protected service: ModelService<UserModel>) {
+  constructor(@Inject(UserModelService) protected service: ModelService<UserModel>,
+              @Inject(ProjectModelService) protected ps: ModelService<ProjectModel>) {
     super(service);
   }
 
@@ -25,6 +26,8 @@ export class UserModel extends BaseModel<UserModel> {
   }
 
   projects() {
-    return this.child('projects');
+    return this.ps.listFromRelation(
+      this.child('projects')
+    );
   }
 }
