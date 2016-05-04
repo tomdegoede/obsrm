@@ -84,8 +84,4 @@ export class ModelService<T extends BaseModel<T>> {
 
     return this.list_ref.push(obj);
   }
-
-  listFromRelation(ref:Firebase, reverse: string):FirebaseRelationListObservable<RelatedUnwrappedSnapshot<T>[]> {
-    return new FirebaseRelationListObservable<any[]>(ref, this, reverse);
-  }
 }

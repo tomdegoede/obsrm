@@ -12,13 +12,14 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
   // Cant use _ref because super is using it. Super should declare it protected.
   protected __ref: Firebase;
 
-  constructor(_ref: Firebase, protected related_model_service: ModelService<any>, protected reverse: string) {
-    super(null, _ref);
-    this.__ref = _ref;
+  // TODO typings
+  constructor(protected parent: BaseModel<any>, protected relation_key: string, protected related_model_service: ModelService<any>, protected reverse: string) {
+    super(null, parent.child(relation_key));
+    this.__ref = parent.child(relation_key);
 
     let cache:{ [key:string]:T & FirebaseObjectObservable<any> } = {};
     
-    this.source = FirebaseListFactory(_ref).map(
+    this.source = FirebaseListFactory(this.__ref).map(
       collection => {
         // Used to keep track of currently present keys
         let keys = {};
@@ -45,7 +46,7 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
   }
   
   lift<T, R>(operator: Operator<T, R>): Observable<R> {
-    const observable = new FirebaseRelationListObservable<R>(this.__ref, this.related_model_service, this.reverse);
+    const observable = new FirebaseRelationListObservable<R>(this.parent, this.relation_key, this.related_model_service, this.reverse);
     observable.source = this;
     observable.operator = operator;
     return observable;

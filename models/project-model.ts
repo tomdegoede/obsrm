@@ -14,8 +14,6 @@ export class ProjectModel extends BaseModel<ProjectModel> {
   }
 
   tasks() {
-    return this.ts.listFromRelation(
-      this.child('tasks'), 'project'
-    );
+    return this.createRelation('tasks', this.ts, 'project');
   }
 }

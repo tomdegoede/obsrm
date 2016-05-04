@@ -14,14 +14,10 @@ export class UserModel extends BaseModel<UserModel> {
   }
 
   teams() {
-    return this.ts.listFromRelation(
-      this.child('teams'), 'users'
-    );
+    return this.createRelation('teams', this.ts, 'users');
   }
 
   projects() {
-    return this.ps.listFromRelation(
-      this.child('projects'), 'users'
-    );
+    return this.createRelation('projects', this.ps, 'users');
   }
 }

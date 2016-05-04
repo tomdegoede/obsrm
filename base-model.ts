@@ -1,5 +1,6 @@
 import {FirebaseObjectObservable} from "angularfire2";
 import {ModelService} from '.';
+import {FirebaseRelationListObservable} from './firebase_relation_list_observable';
 
 export type ModelType<T extends BaseModel<T>> = T;
 
@@ -28,6 +29,10 @@ export abstract class BaseModel<T extends BaseModel<T>> {
 
   child(path:string): Firebase {
     return this._ref.child(path);
+  }
+  
+  protected createRelation(relation_key: string, related_service:ModelService<any>, reverse_key?:string) {
+    return new FirebaseRelationListObservable<any[]>(this, relation_key, related_service, reverse_key);
   }
 
   private mergeObject(a, b) {
