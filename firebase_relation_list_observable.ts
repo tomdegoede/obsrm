@@ -53,12 +53,11 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
   }
 
   push(val: any): FirebaseWithPromise<void> {
-    // TODO get a ref to the parent model instead of assuming its the direct parent
     if(this.reverse) {
       if(val[this.reverse] === undefined) {
         val[this.reverse] = {};
       }
-      val[this.reverse][this.__ref.parent().key()] = true;
+      val[this.reverse][this.parent.ref.key()] = true;
     }
 
     let ref = super.push(true);
