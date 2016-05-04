@@ -1,13 +1,7 @@
 import {ApplicationRef, Inject, Injectable} from "angular2/core";
 import {AngularFire, FirebaseListObservable, FirebaseObjectObservable, FirebaseRef} from 'angularfire2/angularfire2';
-import {AFUnwrappedDataSnapshot} from "angularfire2/utils/firebase_list_observable";
-import * as utils from "angularfire2/utils/utils";
 import {BaseModel} from ".";
-import {FirebaseRelationListObservable} from './firebase_relation_list_observable';
-
-export interface RelatedUnwrappedSnapshot<T extends BaseModel<T>> extends AFUnwrappedDataSnapshot {
-  $related:T & FirebaseObjectObservable<any>;
-}
+import {FirebaseRelationListObservable, RelatedUnwrappedSnapshot} from './firebase_relation_list_observable';
 
 // TODO return type T models
 @Injectable()
@@ -92,33 +86,6 @@ export class ModelService<T extends BaseModel<T>> {
   }
 
   listFromRelation(ref:Firebase, reverse: string):FirebaseRelationListObservable<RelatedUnwrappedSnapshot<T>[]> {
-    let r:FirebaseRelationListObservable<any[]> = new FirebaseRelationListObservable<any[]>(ref, this, reverse);
-
-    let cache:{ [key:string]:T & FirebaseObjectObservable<any> } = {};
-
-    return <FirebaseRelationListObservable<RelatedUnwrappedSnapshot<T>[]>>r.map(
-      collection => {
-        // Used to keep track of currently present keys
-        let keys = {};
-
-        let ret = collection.map(
-          (item:RelatedUnwrappedSnapshot<T>) => {
-            // Keep track of currently present keys
-            keys[item.$key] = true;
-            // retrieve or create, and then cache the object observable
-            item.$related = cache[item.$key] = cache[item.$key] || this.get(item.$key);
-            return item;
-          }
-        );
-
-        // Delete all missing keys from the cache
-        Object
-          .keys(cache)
-          .filter(k => !keys[k])
-          .forEach(k => delete cache[k]);
-
-        return ret;
-      }
-    );
+    return new FirebaseRelationListObservable<any[]>(ref, this, reverse);
   }
 }
