@@ -3,6 +3,7 @@ import {AngularFire, FirebaseListObservable, FirebaseObjectObservable, FirebaseR
 import {AFUnwrappedDataSnapshot} from "angularfire2/utils/firebase_list_observable";
 import * as utils from "angularfire2/utils/utils";
 import {BaseModel} from ".";
+import {FirebaseRelationListObservable} from './firebase_relation_list_observable';
 
 export interface RelatedUnwrappedSnapshot<T extends BaseModel<T>> extends AFUnwrappedDataSnapshot {
   $related:T & FirebaseObjectObservable<any>;
@@ -90,25 +91,17 @@ export class ModelService<T extends BaseModel<T>> {
     return this.list_ref.push(obj);
   }
 
-  listFromRelation(relation:FirebaseListObservable<any[]> | Firebase):FirebaseListObservable<RelatedUnwrappedSnapshot<T>[]> {
-    let r:FirebaseListObservable<any[]>;
-
-    if (utils.isFirebaseRef(relation)) {
-      r = this.af.database.list(
-        <Firebase>relation
-      );
-    } else {
-      r = <FirebaseListObservable<any[]>>relation;
-    }
+  listFromRelation(ref:Firebase, reverse: string):FirebaseRelationListObservable<RelatedUnwrappedSnapshot<T>[]> {
+    let r:FirebaseRelationListObservable<any[]> = new FirebaseRelationListObservable<any[]>(ref, this, reverse);
 
     let cache:{ [key:string]:T & FirebaseObjectObservable<any> } = {};
 
-    return <FirebaseListObservable<RelatedUnwrappedSnapshot<T>[]>>r.map(
+    return <FirebaseRelationListObservable<RelatedUnwrappedSnapshot<T>[]>>r.map(
       collection => {
         // Used to keep track of currently present keys
         let keys = {};
 
-        let r = collection.map(
+        let ret = collection.map(
           (item:RelatedUnwrappedSnapshot<T>) => {
             // Keep track of currently present keys
             keys[item.$key] = true;
@@ -124,7 +117,7 @@ export class ModelService<T extends BaseModel<T>> {
           .filter(k => !keys[k])
           .forEach(k => delete cache[k]);
 
-        return r;
+        return ret;
       }
     );
   }

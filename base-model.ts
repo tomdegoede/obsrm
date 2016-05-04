@@ -26,7 +26,7 @@ export abstract class BaseModel<T extends BaseModel<T>> {
     );
   }
 
-  child(path:string) {
+  child(path:string): Firebase {
     return this._ref.child(path);
   }
 
