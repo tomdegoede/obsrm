@@ -1,5 +1,5 @@
 import {BaseModel, ModelService, UserModelService, ProjectModelService, ProjectModel, TeamModelService, TeamModel} from '..';
-import {Inject, Injectable} from "angular2/core";
+import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
 export class UserModel extends BaseModel<UserModel> {

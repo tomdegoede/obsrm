@@ -1,5 +1,5 @@
 import {BaseModel, ModelService, TaskModelService} from '..';
-import {Inject, Injectable} from "angular2/core";
+import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
 export class TaskModel extends BaseModel<TaskModel> {

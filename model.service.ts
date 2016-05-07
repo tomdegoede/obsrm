@@ -1,4 +1,4 @@
-import {ApplicationRef, Inject, Injectable} from "angular2/core";
+import {ApplicationRef, Inject, Injectable} from "@angular/core";
 import {AngularFire, FirebaseListObservable, FirebaseObjectObservable, FirebaseRef} from 'angularfire2/angularfire2';
 import {BaseModel} from ".";
 import {FirebaseRelationListObservable, RelatedUnwrappedSnapshot} from './firebase_relation_list_observable';

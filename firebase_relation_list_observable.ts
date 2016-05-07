@@ -14,7 +14,7 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
 
   // TODO typings
   constructor(protected parent: BaseModel<any>, protected relation_key: string, protected related_model_service: ModelService<any>, protected reverse: string) {
-    super(null, parent.child(relation_key));
+    super(parent.child(relation_key));
     this.__ref = parent.child(relation_key);
 
     let cache:{ [key:string]:T & FirebaseObjectObservable<any> } = {};

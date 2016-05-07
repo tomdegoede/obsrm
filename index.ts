@@ -1,4 +1,4 @@
-import {provide, OpaqueToken, ApplicationRef} from "angular2/core";
+import {provide, OpaqueToken, ApplicationRef} from "@angular/core";
 
 // Export these before before initializing models so they are defined.
 export const UserModelService = new OpaqueToken('UserModelService');
