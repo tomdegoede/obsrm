@@ -13,24 +13,29 @@ export abstract class BaseModel<T extends BaseModel<T>> {
 
   }
 
-  setRef(ref:Firebase) {
+  setRef(ref:Firebase):BaseModel<T> {
     this._ref = ref;
+    return this;
   }
 
   get ref() {
     return this._ref;
   }
 
-  observable():FirebaseObjectObservable<any> {
-    return this.service.database().object(
+  observable():FirebaseObjectObservable<T> {
+    return <FirebaseObjectObservable<T>>this.service.database().object(
       this._ref
-    );
+    ).map(properties => {
+      let model = this.service.newInstance().setRef(this._ref);
+      Object.assign(model, properties);
+      return model;
+    });
   }
 
   child(path:string): Firebase {
     return this._ref.child(path);
   }
-  
+
   protected createRelation(relation_key: string, related_service:ModelService<any>, reverse_key?:string) {
     return new FirebaseRelationListObservable<any[]>(this, relation_key, related_service, reverse_key);
   }

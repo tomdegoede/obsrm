@@ -7,7 +7,7 @@ import {FirebaseRelationListObservable, RelatedUnwrappedSnapshot} from './fireba
 @Injectable()
 export class ModelService<T extends BaseModel<T>> {
 
-  protected Type: { new(service: ModelService<T>): T ;};
+  public Type: { new(service: ModelService<T>): T ;};
   protected _instance: T;
 
   get Instance(): T {
@@ -24,7 +24,7 @@ export class ModelService<T extends BaseModel<T>> {
 
   }
 
-  protected newInstance(): T {
+  public newInstance(): T {
     return this.app.injector.get(this.Type);
   }
 

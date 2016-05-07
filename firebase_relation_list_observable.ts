@@ -29,6 +29,8 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
             // Keep track of currently present keys
             keys[item.$key] = true;
             // retrieve or create, and then cache the object observable
+
+            // TODO assign key to related & resolved related
             item.$related = cache[item.$key] = cache[item.$key] || related_model_service.get(item.$key);
             return item;
           }
