@@ -47,7 +47,7 @@ export class FirebaseRelationListObservable<T> extends FirebaseListObservable<T>
     );
   }
   
-  lift<T, R>(operator: Operator<T, R>): Observable<R> {
+  lift<T, R>(operator: Operator<T, R>): FirebaseRelationListObservable<R> {
     const observable = new FirebaseRelationListObservable<R>(this.parent, this.relation_key, this.related_model_service, this.reverse);
     observable.source = this;
     observable.operator = operator;
