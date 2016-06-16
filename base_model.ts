@@ -1,8 +1,14 @@
-import {FirebaseObjectObservable} from "angularfire2";
+import {Observable} from "rxjs";
 import {ModelService} from '.';
-import {FirebaseRelationListObservable} from './firebase_relation_list_observable';
 
 export type ModelType<T extends BaseModel<T>> = T;
+
+export interface pushableCollection {
+  push(new_entry: any);
+}
+
+export type ModelObservable<T> = T & Observable<T>;
+export type ModelCollectionObservable<T> = Observable<ModelObservable<T>[]> & pushableCollection;
 
 export abstract class BaseModel<T extends BaseModel<T>> {
   abstract path():string;
@@ -11,6 +17,16 @@ export abstract class BaseModel<T extends BaseModel<T>> {
 
   constructor(protected service:ModelService<T>) {
 
+  }
+
+  key() {
+    return this.service.key(this.typed);
+  }
+
+  // Not sure why I can't just cast <T>this
+  // Since this class is abstract meaning this is always derived this is safe
+  get typed(): T {
+    return <T><any>this;
   }
 
   setRef(ref:Firebase):BaseModel<T> {
@@ -22,22 +38,12 @@ export abstract class BaseModel<T extends BaseModel<T>> {
     return this._ref;
   }
 
-  observable():FirebaseObjectObservable<T> {
-    return <FirebaseObjectObservable<T>>this.service.database().object(
-      this._ref
-    ).map(properties => {
-      let model = this.service.newInstance().setRef(this._ref);
-      Object.assign(model, properties);
-      return model;
-    });
+  observable():Observable<T> {
+    return this.service.observable(this.typed);
   }
 
   child(path:string): Firebase {
     return this._ref.child(path);
-  }
-
-  protected createRelation(relation_key: string, related_service:ModelService<any>, reverse_key?:string) {
-    return new FirebaseRelationListObservable<any[]>(this, relation_key, related_service, reverse_key);
   }
 
   private mergeObject(a, b) {
@@ -68,7 +74,19 @@ export abstract class BaseModel<T extends BaseModel<T>> {
     return o;
   }
 
-  withObservable():T & FirebaseObjectObservable<any> {
+  withObservable():T & Observable<T> {
     return this.mergeObject(this, this.observable());
+  }
+
+  /**
+   * @param related related model service
+   * @param other_key The key referencing this model on the related object
+   * @param local_index An optional local index for drivers that don't support an automated index
+   */
+  hasMany<R extends BaseModel<R>>(
+    related: ModelService<R>,
+    other_key: string,
+    local_index?: string): ModelCollectionObservable<R> {
+    return this.service.hasMany<R>(this, related, other_key, local_index);
   }
 }

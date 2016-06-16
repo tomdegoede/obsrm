@@ -6,16 +6,18 @@ export const TeamModelService = new OpaqueToken('TeamModelService');
 export const ProjectModelService = new OpaqueToken('ProjectModelService');
 export const TaskModelService = new OpaqueToken('TaskModelService');
 
+export {FirebaseModelService} from "./firebase/firebase_model.service";
 export {ModelService} from "./model.service";
-export {BaseModel, ModelType} from "./base-model";
+export {BaseModel, ModelObservable, ModelCollectionObservable, pushableCollection} from "./base_model";
 export {TeamModel} from "./models/team-model";
 export {UserModel} from "./models/user-model";
 export {ProjectModel} from './models/project-model';
 export {TaskModel} from './models/task-model';
 
-import {BaseModel} from './base-model';
+import {BaseModel} from './base_model';
 import {ModelService, TeamModel, UserModel, ProjectModel, TaskModel} from '.';
 import {FirebaseRef, AngularFire} from "angularfire2";
+import {FirebaseModelService} from './firebase/firebase_model.service';
 
 interface modelAndService {
   model;
@@ -32,8 +34,8 @@ let modelServiceMap:modelAndService[] = [
 export const MODEL_PROVIDERS:any[] = [
   modelServiceMap.map(
     o => provide(o.service, {
-      useFactory: (ref: Firebase, app: ApplicationRef, af: AngularFire) => {
-        let p = new ModelService(ref, app, af);
+      useFactory: (ref:Firebase, app:ApplicationRef, af:AngularFire) => {
+        let p = new FirebaseModelService(app, ref, af);
         p.setType(o.model);
         return p;
       },
