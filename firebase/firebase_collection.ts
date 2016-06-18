@@ -2,6 +2,7 @@ import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
 import {BaseModel, pushableCollection, ModelService, ModelObservable} from '..';
+import {DatabaseInterface} from '../database.interface';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<ModelObservable<T>[]> implements pushableCollection {
   // Cant use _ref because super is using it. Super should declare it protected.
@@ -10,7 +11,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   // TODO typings
   constructor(
     protected model:BaseModel<any>,
-    protected related:ModelService<T>,
+    protected related:DatabaseInterface<T>,
     protected other_key:string,
     protected local_index?:string) {
     super(model.child(local_index));

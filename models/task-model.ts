@@ -1,4 +1,4 @@
-import {BaseModel, ModelService, TaskModelService} from '..';
+import {BaseModel, ModelService} from '..';
 import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
@@ -7,7 +7,7 @@ export class TaskModel extends BaseModel<TaskModel> {
     return 'tasks';
   }
 
-  constructor(@Inject(TaskModelService) protected service: ModelService<TaskModel>) {
-    super(service);
+  constructor(protected ms: ModelService) {
+    super(ms);
   }
 }

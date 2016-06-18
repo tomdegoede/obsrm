@@ -3,12 +3,12 @@ import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
 import {Observable} from "rxjs";
 
 import {BaseModel, ModelObservable, ModelCollectionObservable} from "../base_model";
-import {ModelService} from "../model.service";
 import {FirebaseCollection} from './firebase_collection';
+import {DatabaseInterface} from '../database.interface';
 
 // TODO return type T models
 @Injectable()
-export class FirebaseModelService<T extends BaseModel<T>> extends ModelService<T> {
+export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface<T> {
 
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
               @Inject(FirebaseRef) protected ref:Firebase,
@@ -22,19 +22,18 @@ export class FirebaseModelService<T extends BaseModel<T>> extends ModelService<T
     ).withObservable();
   }
 
-  observable(model: T): Observable<T> {
+  protected newObservable(model: T): Observable<T> {
     return <Observable<T>>this.database().object(
       model.ref
-    ).map(properties => {
-      let m = this.newInstance().setRef(model.ref);
-      Object.assign(m, properties);
-      return m;
+    ).map(attributes => {
+      return model
+        .setAttributes(attributes);
     });
   }
 
   hasMany<R extends BaseModel<R>>(
     model:BaseModel<T>,
-    related:ModelService<R>,
+    related:DatabaseInterface<R>,
     other_key:string,
     local_index?:string):ModelCollectionObservable<R> {
 
@@ -56,11 +55,11 @@ export class FirebaseModelService<T extends BaseModel<T>> extends ModelService<T
   }
 
   get list_ref() {
-    if (!this.Type) {
-      throw new Error("Type has not been set for a FirebaseModelService!");
+    if (!this.type) {
+      throw new Error("Type has not been set for a FirebaseInterface!");
     }
 
-    return this.ref.child(`/${this.Instance.path()}`);
+    return this.ref.child(`/${this.newInstance().path()}`);
   }
 
   child(path:string):Firebase {

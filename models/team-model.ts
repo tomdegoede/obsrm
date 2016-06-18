@@ -1,4 +1,4 @@
-import {BaseModel, ModelService, TeamModelService} from '..';
+import {BaseModel, ModelService} from '..';
 import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
@@ -7,7 +7,7 @@ export class TeamModel extends BaseModel<TeamModel> {
     return 'teams';
   }
 
-  constructor(@Inject(TeamModelService) protected service: ModelService<TeamModel>) {
-    super(service);
+  constructor(ms: ModelService) {
+    super(ms);
   }
 }

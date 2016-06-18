@@ -1,5 +1,6 @@
 import {Observable} from "rxjs";
 import {ModelService} from '.';
+import {DatabaseInterface} from './database.interface';
 
 export type ModelType<T extends BaseModel<T>> = T;
 
@@ -11,11 +12,36 @@ export type ModelObservable<T> = T & Observable<T>;
 export type ModelCollectionObservable<T> = Observable<ModelObservable<T>[]> & pushableCollection;
 
 export abstract class BaseModel<T extends BaseModel<T>> {
+  protected attributes: {[key:string]:any} = {};
+  protected obs: Observable<T>;
+
+  public setAttributes(attributes: {[key:string]:any}) {
+    this.attributes = attributes;
+    return this;
+  }
+
+  public getObservable() {
+    return this.obs;
+  }
+
+  public setObservable(o: Observable<T>) {
+    this.obs = o;
+  }
+
+  get a() {
+    return this.attributes;
+  }
+
   abstract path():string;
 
   protected _ref:Firebase;
 
-  constructor(protected service:ModelService<T>) {
+  get service(): DatabaseInterface<T> {
+    return <DatabaseInterface<T>>
+              this.ms.model(this.constructor);
+  }
+
+  constructor(protected ms:ModelService) {
 
   }
 
@@ -74,8 +100,8 @@ export abstract class BaseModel<T extends BaseModel<T>> {
     return o;
   }
 
-  withObservable():T & Observable<T> {
-    return this.mergeObject(this, this.observable());
+  withObservable():ModelObservable<T> {
+    return this.mergeObject(this.observable(), this);
   }
 
   /**
@@ -84,7 +110,7 @@ export abstract class BaseModel<T extends BaseModel<T>> {
    * @param local_index An optional local index for drivers that don't support an automated index
    */
   hasMany<R extends BaseModel<R>>(
-    related: ModelService<R>,
+    related: DatabaseInterface<R>,
     other_key: string,
     local_index?: string): ModelCollectionObservable<R> {
     return this.service.hasMany<R>(this, related, other_key, local_index);

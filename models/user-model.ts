@@ -1,4 +1,4 @@
-import {BaseModel, ModelService, UserModelService, ProjectModelService, ProjectModel, TeamModelService, TeamModel} from '..';
+import {BaseModel, ModelService, ProjectModel, TeamModel} from '..';
 import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
@@ -7,17 +7,15 @@ export class UserModel extends BaseModel<UserModel> {
     return 'users';
   }
 
-  constructor(@Inject(UserModelService) protected service: ModelService<UserModel>,
-              @Inject(ProjectModelService) protected ps: ModelService<ProjectModel>,
-              @Inject(TeamModelService) protected ts: ModelService<TeamModel>) {
-    super(service);
+  constructor(protected ms: ModelService) {
+    super(ms);
   }
 
   teams() {
-    return this.hasMany(this.ts, 'users', 'teams');
+    return this.hasMany(this.ms.model<TeamModel>(TeamModel), 'users', 'teams');
   }
 
   projects() {
-    return this.hasMany(this.ps, 'users', 'projects');
+    return this.hasMany(this.ms.model<ProjectModel>(ProjectModel), 'users', 'projects');
   }
 }
