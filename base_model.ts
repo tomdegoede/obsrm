@@ -11,6 +11,7 @@ export interface pushableCollection {
 export type ModelObservable<T> = T & Observable<T>;
 export type ModelCollectionObservable<T> = Observable<ModelObservable<T>[]> & pushableCollection;
 
+// TODO extend observable
 export abstract class BaseModel<T extends BaseModel<T>> {
   protected attributes: {[key:string]:any} = {};
   protected obs: Observable<T>;

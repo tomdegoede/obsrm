@@ -49,6 +49,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   push(val: any): FirebaseWithPromise<void> {
+    // TODO fix value assign
     if(this.other_key) {
       if(val[this.other_key] === undefined) {
         val[this.other_key] = {};
