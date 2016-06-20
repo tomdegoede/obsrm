@@ -13,6 +13,8 @@ export type ModelCollectionObservable<T> = Observable<ModelObservable<T>[]> & pu
 
 // TODO extend observable
 export abstract class BaseModel<T extends BaseModel<T>> {
+
+  // TODO rename to properties
   protected attributes: {[key:string]:any} = {};
   protected obs: Observable<T>;
 

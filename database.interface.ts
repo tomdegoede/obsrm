@@ -1,6 +1,7 @@
 import {BaseModel, ModelCollectionObservable, ModelObservable} from './base_model';
-import {Inject, ApplicationRef} from "@angular/core";
+import {Inject, reflector, ApplicationRef} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
+import {inject} from './inject';
 
 export abstract class DatabaseInterface<T extends BaseModel<T>> {
 
@@ -40,9 +41,10 @@ export abstract class DatabaseInterface<T extends BaseModel<T>> {
 
   public setType(t) {
     this.type = t;
+    return this;
   }
 
   public newInstance():T {
-    return this.app.injector.get(this.type);
+    return inject(this.type, this.app.injector);
   }
 }

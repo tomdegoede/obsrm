@@ -9,16 +9,6 @@ export abstract class ModelService {
   }
 
   public model<R extends BaseModel<R>>(type): DatabaseInterface<R> {
-    let i: DatabaseInterface<R> = this.app.injector.get(DatabaseInterface)();
-    i.setType(type);
-    return i;
+    return this.app.injector.get(DatabaseInterface)(type);
   }
-  //
-  // get Instance():T {
-  //   if (this._instance === undefined) {
-  //     this._instance = this.newInstance();
-  //   }
-  //
-  //   return this._instance;
-  // }
 }
