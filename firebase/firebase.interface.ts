@@ -6,7 +6,6 @@ import {BaseModel, ModelCollectionObservable} from "../base_model";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseInterface} from '../database.interface';
 
-// TODO return type T models
 @Injectable()
 export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface<T> {
 
@@ -39,10 +38,8 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
     model:BaseModel<T>,
     related:DatabaseInterface<R>,
     other_key:string,
-    local_index?:string):ModelCollectionObservable<R> {
-
-    let cache:{ [key:string]:T } = {};
-
+    local_index?:string
+  ): ModelCollectionObservable<R> {
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
@@ -53,8 +50,6 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
   static getRef(model: BaseModel<any>): Firebase {
     return model.source_object;
   }
-
-// Type checking is failing on this even though we can assure this = FirebaseModelService<T> and not FirebaseModelService
 
   protected newInstanceWithRef(r:Firebase):T {
     let o = this.newInstance();

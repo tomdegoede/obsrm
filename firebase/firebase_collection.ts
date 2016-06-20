@@ -14,7 +14,8 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     protected model:BaseModel<any>,
     protected related:DatabaseInterface<T>,
     protected other_key:string,
-    protected local_index?:string) {
+    protected local_index?:string
+  ) {
     super(FirebaseInterface.getRef(model).child(local_index));
     this.__ref = FirebaseInterface.getRef(model).child(local_index);
 
