@@ -24,11 +24,15 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
 
   newObservable(model: T): Observable<T> {
     return <Observable<T>>this.database().object(
-      model.ref
+      FirebaseInterface.getRef(model)
     ).map(properties => {
       return model
         .setProperties(properties);
     });
+  }
+
+  processSourceObject(model: T, source: Firebase) {
+    model.source_object = source;
   }
 
   hasMany<R extends BaseModel<R>>(
@@ -43,14 +47,18 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
   }
 
   key(model: T): any {
-    return model.ref.key();
+    return FirebaseInterface.getRef(model).key();
+  }
+
+  static getRef(model: BaseModel<any>): Firebase {
+    return model.source_object;
   }
 
 // Type checking is failing on this even though we can assure this = FirebaseModelService<T> and not FirebaseModelService
 
   protected newInstanceWithRef(r:Firebase):T {
     let o = this.newInstance();
-    o.setRef(r);
+    o.setSource(r);
     return o;
   }
 

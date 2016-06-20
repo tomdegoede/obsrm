@@ -3,6 +3,7 @@ import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
 import {BaseModel, pushableCollection, ModelService} from '..';
 import {DatabaseInterface} from '../database.interface';
+import {FirebaseInterface} from './firebase.interface';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements pushableCollection {
   // Cant use _ref because super is using it. Super should declare it protected.
@@ -14,12 +15,12 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     protected related:DatabaseInterface<T>,
     protected other_key:string,
     protected local_index?:string) {
-    super(model.child(local_index));
-    this.__ref = model.child(local_index);
+    super(FirebaseInterface.getRef(model).child(local_index));
+    this.__ref = FirebaseInterface.getRef(model).child(local_index);
 
     let cache:{ [key:string]:T } = {};
 
-    this.source = FirebaseListFactory(model.child(local_index))
+    this.source = FirebaseListFactory(this.__ref)
       .map(collection => {
         // Used to keep track of currently present keys
         let keys = {};
@@ -49,12 +50,11 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   push(val: any): FirebaseWithPromise<void> {
-    // TODO fix value assign
     if(this.other_key) {
       if(val[this.other_key] === undefined) {
         val[this.other_key] = {};
       }
-      val[this.other_key][this.model.ref.key()] = true;
+      val[this.other_key][this.model.key()] = true;
     }
 
     let ref = super.push(true);

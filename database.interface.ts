@@ -11,6 +11,8 @@ export abstract class DatabaseInterface<T extends BaseModel<T>> {
 
   abstract newObservable(model: T): Observable<T>;
 
+  abstract processSourceObject(model: T, source:any);
+
   /**
    * @param model Parent model
    * @param related Related model service

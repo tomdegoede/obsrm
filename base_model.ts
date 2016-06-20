@@ -10,21 +10,12 @@ export type ModelCollectionObservable<T> = Observable<T[]> & pushableCollection;
 
 export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
-  // TODO rename to properties
   protected properties: {[key:string]:any} = {};
-  protected obs: Observable<T>;
+  source_object: any;
 
   public setProperties(properties: {[key:string]:any}) {
     this.properties = properties;
     return this;
-  }
-
-  public getObservable() {
-    return this.obs;
-  }
-
-  public setObservable(o: Observable<T>) {
-    this.obs = o;
   }
 
   get p() {
@@ -32,8 +23,6 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
   }
 
   abstract path():string;
-
-  protected _ref:Firebase;
 
   get service(): DatabaseInterface<T> {
     return <DatabaseInterface<T>>
@@ -54,18 +43,10 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
     return <T><any>this;
   }
 
-  setRef(ref:Firebase):BaseModel<T> {
-    this._ref = ref;
+  setSource(source): T {
+    this.service.processSourceObject(this.typed, source);
     this.source = this.service.newObservable(this.typed);
-    return this;
-  }
-
-  get ref() {
-    return this._ref;
-  }
-
-  child(path:string): Firebase {
-    return this._ref.child(path);
+    return this.typed;
   }
 
   /**
