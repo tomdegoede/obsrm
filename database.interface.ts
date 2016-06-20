@@ -29,6 +29,8 @@ export abstract class DatabaseInterface<T extends BaseModel<T>> {
 
   abstract key(model: T): any;
 
+  abstract delete(entity: T | string);
+
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef) {
 
   }

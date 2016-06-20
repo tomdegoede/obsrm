@@ -5,6 +5,8 @@ import {Observable} from "rxjs";
 import {BaseModel, ModelCollectionObservable} from "../base_model";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseInterface} from '../database.interface';
+import {isString} from '@angular/core/src/facade/lang';
+import {Relation} from '../relations';
 
 @Injectable()
 export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface<T> {
@@ -45,6 +47,43 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
 
   key(model: T): any {
     return FirebaseInterface.getRef(model).key();
+  }
+
+  protected disableReverse(model: T, relation: Relation): Promise<any> {
+    // Can potentially use relationship fetch
+    let promise = FirebaseInterface.getRef(model).child(relation.call).once('value');
+
+    promise.then((dataSnapshot: FirebaseDataSnapshot) => {
+      let promises = Object.keys(dataSnapshot.val() || {}).map(
+        key => {
+          let child = this.ref.child(relation.related).child(key).child(relation.reverse.call).child(model.key());
+          child.remove();
+          // TODO soft delete
+          // child.set(false);
+        }
+      );
+    });
+
+    return promise;
+  }
+
+  delete(entity: T | string) {
+    if(isString(entity)) {
+      entity = this.get(<string>entity);
+    }
+
+    let model: T = <T>entity;
+
+    let key = model.key();
+
+    let promises: Promise<any>[] = model.getRelations().map<Promise<any>>(
+      relation => this.disableReverse(model, relation)
+    );
+
+    return Promise.all(promises).then(
+      // TODO soft delete
+      () => FirebaseInterface.getRef(model).remove()
+    );
   }
 
   static getRef(model: BaseModel<any>): Firebase {

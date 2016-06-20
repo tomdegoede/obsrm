@@ -26,6 +26,12 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
         // Used to keep track of currently present keys
         let keys = {};
 
+        // TODO Rewrite filter map to a reduce to reduce loops
+        // Only when softdeletes
+        collection = collection.filter(item => {
+          return item.$value;
+        });
+
         let ret = collection.map(
           item => {
             keys[item.$key] = true;

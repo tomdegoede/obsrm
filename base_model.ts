@@ -1,6 +1,7 @@
 import {Observable} from "rxjs";
 import {ModelService} from '.';
 import {DatabaseInterface} from './database.interface';
+import {Relation} from './relations';
 
 export interface pushableCollection {
   push(new_entry: any);
@@ -10,6 +11,7 @@ export type ModelCollectionObservable<T> = Observable<T[]> & pushableCollection;
 
 export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
+  protected relations: Relation[];
   protected properties: {[key:string]:any} = {};
   source_object: any;
 
@@ -20,6 +22,10 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
 
   get p() {
     return this.properties;
+  }
+
+  public getRelations(): Relation[] {
+    return this.relations;
   }
 
   abstract path():string;
@@ -59,5 +65,9 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
     other_key: string,
     local_index?: string): ModelCollectionObservable<R> {
     return this.service.hasMany<R>(this, related, other_key, local_index);
+  }
+
+  delete() {
+    return this.service.delete(this.typed);
   }
 }

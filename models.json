@@ -1,0 +1,13 @@
+{
+  "models": [
+    "projects",
+    "tasks",
+    "users",
+    "teams"
+  ],
+  "relations": [
+    "projects.tasks > tasks.project",
+    "users.projects <> projects.users",
+    "users.teams <> teams.users"
+  ]
+}
