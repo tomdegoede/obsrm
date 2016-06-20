@@ -33,7 +33,7 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
   }
 
   protected setPath() {
-    this._path = this.constructor.prototype.__path = this.constructor.prototype.__path || this.resolvePath();
+    return this.constructor.prototype._path = this.constructor.prototype._path || this.resolvePath();
   }
 
   public setProperties(properties: {[key:string]:any}) {
