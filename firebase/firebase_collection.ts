@@ -1,15 +1,15 @@
 import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
-import {BaseModel, pushableCollection, ModelService} from '..';
+import {BaseModel, ModelCollectionObservable} from '..';
 import {DatabaseInterface} from '../database.interface';
 import {FirebaseInterface} from './firebase.interface';
 
-export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements pushableCollection {
+export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
   protected __ref: Firebase;
+  protected _cache: {[key:string]:T} = {};
 
-  // TODO typings
   constructor(
     protected model:BaseModel<any>,
     protected related:DatabaseInterface<T>,
@@ -19,34 +19,48 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     super(FirebaseInterface.getRef(model).child(local_index));
     this.__ref = FirebaseInterface.getRef(model).child(local_index);
 
-    let cache:{ [key:string]:T } = {};
-
     this.source = FirebaseListFactory(this.__ref)
-      .map(collection => {
-        // Used to keep track of currently present keys
-        let keys = {};
+      .map(collection => this.processCollection(collection));
+  }
 
-        // TODO Rewrite filter map to a reduce to reduce loops
-        // Only when softdeletes
-        collection = collection.filter(item => {
-          return item.$value;
+  protected processCollection(collection) {
+    let keys = {};
+
+    // TODO Rewrite filter map to a reduce to reduce loops
+    // Only when softdeletes
+    collection = collection.filter(item => {
+      return item.$value;
+    });
+
+    let ret = collection.map(
+      item => {
+        keys[item.$key] = true;
+        return this._cache[item.$key] = this._cache[item.$key] || this.related.get(item.$key);
+      }
+    );
+
+    // Delete all missing keys from the cache
+    Object
+      .keys(this._cache)
+      .filter(k => !keys[k])
+      .forEach(k => delete this._cache[k]);
+
+    return ret;
+  }
+
+  once(): Promise<T[]> {
+    return this.__ref.once("value").then((snapshot: FirebaseDataSnapshot) => {
+      let val = snapshot.val() || {};
+      let items = [];
+      for(let key in val) {
+        items.push({
+          $key: key,
+          $value: val[key]
         });
+      }
 
-        let ret = collection.map(
-          item => {
-            keys[item.$key] = true;
-            return cache[item.$key] = cache[item.$key] || related.get(item.$key);
-          }
-        );
-
-        // Delete all missing keys from the cache
-        Object
-          .keys(cache)
-          .filter(k => !keys[k])
-          .forEach(k => delete cache[k]);
-
-        return ret;
-      });
+      return this.processCollection(items);
+    });
   }
 
   lift<R>(operator: Operator<T, R>): Observable<R> {
@@ -71,5 +85,9 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     );
 
     return ref;
+  }
+
+  remove(key: string) {
+    return this.__ref.child(key).remove();
   }
 }

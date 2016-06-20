@@ -6,7 +6,7 @@ import {BaseModel, ModelCollectionObservable} from "../base_model";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseInterface} from '../database.interface';
 import {isString} from '@angular/core/src/facade/lang';
-import {Relation} from '../relations';
+import {Relation} from '../model.service';
 
 @Injectable()
 export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface<T> {
@@ -50,17 +50,11 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
   }
 
   protected disableReverse(model: T, relation: Relation): Promise<any> {
-    // Can potentially use relationship fetch
-    let promise = FirebaseInterface.getRef(model).child(relation.call).once('value');
+    let promise = model.r[relation.call].once();
 
-    promise.then((dataSnapshot: FirebaseDataSnapshot) => {
-      let promises = Object.keys(dataSnapshot.val() || {}).map(
-        key => {
-          let child = this.ref.child(relation.related).child(key).child(relation.reverse.call).child(model.key());
-          child.remove();
-          // TODO soft delete
-          // child.set(false);
-        }
+    promise.then((collection: BaseModel<any>[]) => {
+      return collection.forEach(
+        related => related.r[relation.reverse.call].remove(model.key())
       );
     });
 

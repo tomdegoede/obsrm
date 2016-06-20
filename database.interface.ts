@@ -1,5 +1,5 @@
 import {BaseModel, ModelCollectionObservable} from './base_model';
-import {Inject, reflector, ApplicationRef} from "@angular/core";
+import {Inject, ApplicationRef} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
 import {inject} from './inject';
 

@@ -3,10 +3,6 @@ import {Inject, Injectable} from "@angular/core";
 
 @Injectable()
 export class UserModel extends BaseModel<UserModel> {
-  path():string {
-    return 'users';
-  }
-
   constructor(protected ms: ModelService) {
     super(ms);
   }
