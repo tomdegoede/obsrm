@@ -2,7 +2,7 @@ import {ApplicationRef, Inject, Injectable} from "@angular/core";
 import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
 import {Observable} from "rxjs";
 
-import {BaseModel, ModelObservable, ModelCollectionObservable} from "../base_model";
+import {BaseModel, ModelCollectionObservable} from "../base_model";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseInterface} from '../database.interface';
 
@@ -16,18 +16,18 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
     super(app);
   }
 
-  get(key:string):ModelObservable<T> {
+  get(key:string):T {
     return this.newInstanceWithRef(
       this.child(key)
-    ).withObservable();
+    );
   }
 
-  protected newObservable(model: T): Observable<T> {
+  newObservable(model: T): Observable<T> {
     return <Observable<T>>this.database().object(
       model.ref
-    ).map(attributes => {
+    ).map(properties => {
       return model
-        .setAttributes(attributes);
+        .setProperties(properties);
     });
   }
 
@@ -37,7 +37,7 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
     other_key:string,
     local_index?:string):ModelCollectionObservable<R> {
 
-    let cache:{ [key:string]:ModelObservable<T> } = {};
+    let cache:{ [key:string]:T } = {};
 
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }

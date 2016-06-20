@@ -1,6 +1,6 @@
 import {DatabaseInterface} from './database.interface';
 export {ModelService} from "./model.service";
-export {BaseModel, ModelObservable, ModelCollectionObservable, pushableCollection} from "./base_model";
+export {BaseModel, ModelCollectionObservable, pushableCollection} from "./base_model";
 export {TeamModel} from "./models/team-model";
 export {UserModel} from "./models/user-model";
 export {ProjectModel} from './models/project-model';

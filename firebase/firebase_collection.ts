@@ -1,10 +1,10 @@
 import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
-import {BaseModel, pushableCollection, ModelService, ModelObservable} from '..';
+import {BaseModel, pushableCollection, ModelService} from '..';
 import {DatabaseInterface} from '../database.interface';
 
-export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<ModelObservable<T>[]> implements pushableCollection {
+export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements pushableCollection {
   // Cant use _ref because super is using it. Super should declare it protected.
   protected __ref: Firebase;
 
@@ -17,7 +17,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     super(model.child(local_index));
     this.__ref = model.child(local_index);
 
-    let cache:{ [key:string]:ModelObservable<T> } = {};
+    let cache:{ [key:string]:T } = {};
 
     this.source = FirebaseListFactory(model.child(local_index))
       .map(collection => {
@@ -40,7 +40,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
         return ret;
       });
   }
-  
+
   lift<R>(operator: Operator<T, R>): Observable<R> {
     const observable = <any>new Observable();
     observable.source = this;
@@ -62,7 +62,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     this.related.updateOrCreate(
       val, ref.key()
     );
-    
+
     return ref;
   }
 }

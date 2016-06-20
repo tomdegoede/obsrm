@@ -1,4 +1,4 @@
-import {BaseModel, ModelCollectionObservable, ModelObservable} from './base_model';
+import {BaseModel, ModelCollectionObservable} from './base_model';
 import {Inject, reflector, ApplicationRef} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
 import {inject} from './inject';
@@ -7,17 +7,9 @@ export abstract class DatabaseInterface<T extends BaseModel<T>> {
 
   protected type;
 
-  abstract get(key:string):ModelObservable<T>;
+  abstract get(key:string):T;
 
-  protected abstract newObservable(model: T): Observable<T>;
-
-  observable(model: T): Observable<T> {
-    if(!model.getObservable()) {
-      model.setObservable(this.newObservable(model));
-    }
-
-    return model.getObservable();
-  }
+  abstract newObservable(model: T): Observable<T>;
 
   /**
    * @param model Parent model
