@@ -15,6 +15,10 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
   protected properties: {[key:string]:any} = {};
   source_object: any;
 
+  constructor(protected ms:ModelService) {
+    super();
+  }
+
   public setProperties(properties: {[key:string]:any}) {
     this.properties = properties;
     return this;
@@ -33,10 +37,6 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
   get service(): DatabaseInterface<T> {
     return <DatabaseInterface<T>>
       this.ms.model(this.constructor);
-  }
-
-  constructor(protected ms:ModelService) {
-    super();
   }
 
   key() {
