@@ -1,6 +1,6 @@
 import {BaseModel} from '.';
 import {Inject, ApplicationRef, OpaqueToken} from "@angular/core";
-import {DatabaseInterface} from './database.interface';
+import {DatabaseConnection} from './database.connection';
 import {isString} from '@angular/core/src/facade/lang';
 
 export const ModelsConfig = new OpaqueToken('ModelsConfig');
@@ -47,12 +47,12 @@ export abstract class ModelService {
     return this.models_config;
   }
 
-  public model<R extends BaseModel<R>>(type): DatabaseInterface<R> {
+  public model<R extends BaseModel<R>>(type): DatabaseConnection<R> {
     if(isString(type)) {
       type = this.config.models[type].class;
     }
 
-    return this.app.injector.get(DatabaseInterface)(type);
+    return this.app.injector.get(DatabaseConnection)(type);
   }
 
   public getRelations(path: string): Relation[] {

@@ -1,13 +1,10 @@
 import {Observable} from "rxjs";
 import {ModelService, Relation} from './model.service';
-import {DatabaseInterface} from './database.interface';
+import {DatabaseConnection} from './database.connection';
+import {ModelCollectionObservable} from './model_collection.interface';
 
-export interface ModelCollectionObservable<T> extends Observable<T[]> {
-  push(new_entry: any);
-  once(): Promise<T[]>;
-  remove(key: string): Promise<void>;
-}
-
+// TODO allow non extended versions that only use the path provided by the config
+// TODO separate relations & properties for FireBase storage
 export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   protected relations: Relation[] = [];
@@ -58,8 +55,8 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
     return this._path;
   }
 
-  get service(): DatabaseInterface<T> {
-    return <DatabaseInterface<T>>
+  get service(): DatabaseConnection<T> {
+    return <DatabaseConnection<T>>
       this.ms.model(this.constructor);
   }
 
@@ -92,7 +89,7 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
    * @param local_index An optional local index for drivers that don't support an automated index
    */
   hasMany<R extends BaseModel<R>>(
-    related: DatabaseInterface<R>,
+    related: DatabaseConnection<R>,
     other_key: string,
     local_index?: string): ModelCollectionObservable<R> {
     return this.service.hasMany<R>(this, related, other_key, local_index);

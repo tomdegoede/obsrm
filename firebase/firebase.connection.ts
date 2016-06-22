@@ -2,14 +2,15 @@ import {ApplicationRef, Inject, Injectable} from "@angular/core";
 import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
 import {Observable} from "rxjs";
 
-import {BaseModel, ModelCollectionObservable} from "../base_model";
+import {BaseModel} from "../base_model";
+import {ModelCollectionObservable} from "../model_collection.interface";
 import {FirebaseCollection} from './firebase_collection';
-import {DatabaseInterface} from '../database.interface';
+import {DatabaseConnection} from '../database.connection';
 import {isString} from '@angular/core/src/facade/lang';
 import {Relation} from '../model.service';
 
 @Injectable()
-export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface<T> {
+export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
               @Inject(FirebaseRef) protected ref:Firebase,
@@ -23,36 +24,34 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
     );
   }
 
-  newObservable(model: T): Observable<T> {
+  newObservable(model:T):Observable<T> {
     return <Observable<T>>this.database().object(
-      FirebaseInterface.getRef(model)
+      FirebaseConnection.getRef(model)
     ).map(properties => {
       return model
         .setProperties(properties);
     });
   }
 
-  processSourceObject(model: T, source: Firebase) {
+  processSourceObject(model:T, source:Firebase) {
     model.source_object = source;
   }
 
-  hasMany<R extends BaseModel<R>>(
-    model:BaseModel<T>,
-    related:DatabaseInterface<R>,
-    other_key:string,
-    local_index?:string
-  ): ModelCollectionObservable<R> {
+  hasMany<R extends BaseModel<R>>(model:BaseModel<T>,
+                                  related:DatabaseConnection<R>,
+                                  other_key:string,
+                                  local_index?:string):ModelCollectionObservable<R> {
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
-  key(model: T): any {
-    return FirebaseInterface.getRef(model).key();
+  key(model:T):any {
+    return FirebaseConnection.getRef(model).key();
   }
 
-  protected disableReverse(model: T, relation: Relation): Promise<any> {
+  protected disableReverse(model:T, relation:Relation):Promise<any> {
     let promise = model.r[relation.call].once();
 
-    promise.then((collection: BaseModel<any>[]) => {
+    promise.then((collection:BaseModel<any>[]) => {
       return collection.forEach(
         related => related.r[relation.reverse.call].remove(model.key())
       );
@@ -61,26 +60,26 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
     return promise;
   }
 
-  delete(entity: T | string) {
-    if(isString(entity)) {
+  delete(entity:T | string) {
+    if (isString(entity)) {
       entity = this.get(<string>entity);
     }
 
-    let model: T = <T>entity;
+    let model:T = <T>entity;
 
     let key = model.key();
 
-    let promises: Promise<any>[] = model.getRelations().map<Promise<any>>(
+    let promises:Promise<any>[] = model.getRelations().map<Promise<any>>(
       relation => this.disableReverse(model, relation)
     );
 
     return Promise.all(promises).then(
       // TODO soft delete
-      () => FirebaseInterface.getRef(model).remove()
+      () => FirebaseConnection.getRef(model).remove()
     );
   }
 
-  static getRef(model: BaseModel<any>): Firebase {
+  static getRef(model:BaseModel<any>):Firebase {
     return model.source_object;
   }
 
@@ -92,7 +91,7 @@ export class FirebaseInterface<T extends BaseModel<T>> extends DatabaseInterface
 
   get list_ref() {
     if (!this.type) {
-      throw new Error("Type has not been set for a FirebaseInterface!");
+      throw new Error("Type has not been set for a FirebaseConnection!");
     }
 
     return this.ref.child(`/${this.newInstance().path()}`);

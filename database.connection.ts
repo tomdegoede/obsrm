@@ -1,9 +1,10 @@
-import {BaseModel, ModelCollectionObservable} from './base_model';
+import {ModelCollectionObservable} from './model_collection.interface';
+import {BaseModel} from './base_model';
 import {Inject, ApplicationRef} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
 import {inject} from './inject';
 
-export abstract class DatabaseInterface<T extends BaseModel<T>> {
+export abstract class DatabaseConnection<T extends BaseModel<T>> {
 
   protected type;
 
@@ -21,7 +22,7 @@ export abstract class DatabaseInterface<T extends BaseModel<T>> {
    */
   abstract hasMany<R extends BaseModel<R>>(
     model: BaseModel<T>,
-    related: DatabaseInterface<R>,
+    related: DatabaseConnection<R>,
     other_key: string,
     local_index?: string): ModelCollectionObservable<R>;
 

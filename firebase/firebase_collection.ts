@@ -2,8 +2,8 @@ import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
 import {BaseModel, ModelCollectionObservable} from '..';
-import {DatabaseInterface} from '../database.interface';
-import {FirebaseInterface} from './firebase.interface';
+import {DatabaseConnection} from '../database.connection';
+import {FirebaseConnection} from './firebase.connection';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
@@ -12,12 +12,12 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
 
   constructor(
     protected model:BaseModel<any>,
-    protected related:DatabaseInterface<T>,
+    protected related:DatabaseConnection<T>,
     protected other_key:string,
     protected local_index?:string
   ) {
-    super(FirebaseInterface.getRef(model).child(local_index));
-    this.__ref = FirebaseInterface.getRef(model).child(local_index);
+    super(FirebaseConnection.getRef(model).child(local_index));
+    this.__ref = FirebaseConnection.getRef(model).child(local_index);
 
     this.source = FirebaseListFactory(this.__ref)
       .map(collection => this.processCollection(collection));
