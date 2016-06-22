@@ -1,21 +1,18 @@
-import {ProjectModel} from './models/project-model';
-import {TaskModel} from './models/task-model';
-import {UserModel} from './models/user-model';
-import {TeamModel} from './models/team-model';
+import {BaseModel} from './base_model';
 
 export var models = {
   "models": {
     "projects": {
-      "class": ProjectModel
+      "class": BaseModel
     },
     "tasks": {
-      "class": TaskModel
+      "class": BaseModel
     },
     "users": {
-      "class": UserModel
+      "class": BaseModel
     },
     "teams": {
-      "class": TeamModel
+      "class": BaseModel
     }
   },
   "relations": [

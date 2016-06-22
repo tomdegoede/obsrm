@@ -1,16 +1,12 @@
 export {BaseModel} from "./base_model";
 export {ModelCollectionObservable} from "./model_collection.interface";
 export {ModelService, ModelsConfig, DatabaseConnectionRef, ModelServiceRef} from "./model.service";
-export {TeamModel} from "./models/team-model";
-export {UserModel} from "./models/user-model";
-export {ProjectModel} from './models/project-model';
-export {TaskModel} from './models/task-model';
 
 import {provide, ApplicationRef} from "@angular/core";
 import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
 import {DatabaseConnectionRef, ModelServiceRef} from './model.service';
 import {FirebaseConnection} from './firebase/firebase.connection';
-import {ModelService, ModelsConfig, BaseModel, TeamModel, UserModel, ProjectModel, TaskModel} from '.';
+import {ModelService, ModelsConfig, BaseModel} from '.';
 import {models} from './models';
 
 export const MODEL_PROVIDERS:any[] = [
