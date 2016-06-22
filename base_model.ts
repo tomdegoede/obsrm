@@ -47,6 +47,14 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
     return this.relation_objects;
   }
 
+  getRelation(key) {
+    if(this.relation_objects[key] === undefined) {
+      return null;
+    }
+
+    return this.relation_objects[key];
+  }
+
   public getRelations(): Relation[] {
     return this.relations;
   }
