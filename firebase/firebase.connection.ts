@@ -7,15 +7,15 @@ import {ModelCollectionObservable} from "../model_collection.interface";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseConnection} from '../database.connection';
 import {isString} from '@angular/core/src/facade/lang';
-import {Relation} from '../model.service';
+import {Relation, ModelService, ModelServiceRef} from '../model.service';
 
 @Injectable()
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
               @Inject(FirebaseRef) protected ref:Firebase,
-              protected af:AngularFire) {
-    super(app);
+              protected af:AngularFire, @Inject(ModelServiceRef) protected ms: ModelService) {
+    super(app, ms);
   }
 
   get(key:string):T {
@@ -90,10 +90,6 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   get list_ref() {
-    if (!this.type) {
-      throw new Error("Type has not been set for a FirebaseConnection!");
-    }
-
     return this.ref.child(`/${this.newInstance().path()}`);
   }
 

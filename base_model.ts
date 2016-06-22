@@ -1,36 +1,20 @@
 import {Observable} from "rxjs";
-import {ModelService, Relation} from './model.service';
+import {ModelService, Relation, ModelServiceRef} from './model.service';
 import {DatabaseConnection} from './database.connection';
 import {ModelCollectionObservable} from './model_collection.interface';
+import {Inject} from '@angular/core';
 
-// TODO allow non extended versions that only use the path provided by the config
 // TODO separate relations & properties for FireBase storage
-export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
+export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   protected relations: Relation[] = [];
   protected relation_objects: {[key:string]:ModelCollectionObservable<any>} = {};
   protected properties: {[key:string]:any} = {};
-  protected _path: string;
   source_object: any;
 
-  constructor(protected ms:ModelService) {
+  constructor(@Inject(ModelServiceRef) protected ms:ModelService, protected _path: string) {
     super();
-
-    this.setPath();
     this.relations = this.ms.getRelations(this.path());
-  }
-
-  protected resolvePath() {
-    let models = this.ms.config.models;
-    for(let path in models) {
-      if(models[path].class === this.constructor) {
-        return path;
-      }
-    }
-  }
-
-  protected setPath() {
-    return this.constructor.prototype._path = this.constructor.prototype._path || this.resolvePath();
   }
 
   public setProperties(properties: {[key:string]:any}) {
@@ -65,7 +49,7 @@ export abstract class BaseModel<T extends BaseModel<T>> extends Observable<T | a
 
   get service(): DatabaseConnection<T> {
     return <DatabaseConnection<T>>
-      this.ms.model(this.constructor);
+      this.ms.model(this.path());
   }
 
   key() {

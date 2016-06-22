@@ -1,9 +1,10 @@
 import {BaseModel} from '.';
 import {Inject, ApplicationRef, OpaqueToken} from "@angular/core";
 import {DatabaseConnection} from './database.connection';
-import {isString} from '@angular/core/src/facade/lang';
 
+export const ModelServiceRef = new OpaqueToken('ModelService');
 export const ModelsConfig = new OpaqueToken('ModelsConfig');
+export const DatabaseConnectionRef = new OpaqueToken('DatabaseConnection');
 
 export interface Relation {
   model: string
@@ -47,12 +48,12 @@ export abstract class ModelService {
     return this.models_config;
   }
 
-  public model<R extends BaseModel<R>>(type): DatabaseConnection<R> {
-    if(isString(type)) {
-      type = this.config.models[type].class;
-    }
+  public model<R extends BaseModel<R>>(type: string): DatabaseConnection<R> {
+    return this.app.injector.get(DatabaseConnectionRef)(type);
+  }
 
-    return this.app.injector.get(DatabaseConnection)(type);
+  public getClass(type: string) {
+    return this.config.models[type].class;
   }
 
   public getRelations(path: string): Relation[] {

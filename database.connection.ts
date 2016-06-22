@@ -1,12 +1,13 @@
 import {ModelCollectionObservable} from './model_collection.interface';
 import {BaseModel} from './base_model';
-import {Inject, ApplicationRef} from "@angular/core";
+import {Inject, ApplicationRef, OpaqueToken} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
 import {inject} from './inject';
+import {ModelService, ModelServiceRef} from './model.service';
 
 export abstract class DatabaseConnection<T extends BaseModel<T>> {
 
-  protected type;
+  protected type: string;
 
   abstract get(key:string):T;
 
@@ -32,16 +33,16 @@ export abstract class DatabaseConnection<T extends BaseModel<T>> {
 
   abstract delete(entity: T | string);
 
-  constructor(@Inject(ApplicationRef) protected app:ApplicationRef) {
+  constructor(@Inject(ApplicationRef) protected app:ApplicationRef, @Inject(ModelServiceRef) protected ms: ModelService) {
 
   }
 
-  public setType(t) {
+  public setType(t: string) {
     this.type = t;
     return this;
   }
 
   public newInstance():T {
-    return inject(this.type, this.app.injector);
+    return inject(this.ms.getClass(this.type), this.app.injector, [this.type]);
   }
 }
