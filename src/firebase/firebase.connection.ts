@@ -13,7 +13,7 @@ import {Relation, ModelService, ModelServiceRef} from '../model.service';
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
-              @Inject(FirebaseRef) protected ref:Firebase,
+              @Inject(FirebaseRef) protected ref:firebase.database.Reference,
               protected af:AngularFire, @Inject(ModelServiceRef) protected ms: ModelService) {
     super(app, ms);
   }
@@ -25,7 +25,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   newObservable(model:T):Observable<T> {
-    return <Observable<T>>this.database().object(
+    return this.database().object(
       FirebaseConnection.getRef(model)
     ).map(properties => {
       return model
@@ -33,7 +33,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     });
   }
 
-  processSourceObject(model:T, source:Firebase) {
+  processSourceObject(model:T, source:firebase.database.Reference) {
     model.source_object = source;
   }
 
@@ -45,7 +45,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   key(model:T):any {
-    return FirebaseConnection.getRef(model).key();
+    return FirebaseConnection.getRef(model).key;
   }
 
   protected disableReverse(model:T, relation:Relation):Promise<any> {
@@ -79,11 +79,11 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
-  static getRef(model:BaseModel<any>):Firebase {
+  static getRef(model:BaseModel<any>):firebase.database.Reference {
     return model.source_object;
   }
 
-  protected newInstanceWithRef(r:Firebase):T {
+  protected newInstanceWithRef(r:firebase.database.Reference):T {
     let o = this.newInstance();
     o.setSource(r);
     return o;
@@ -93,7 +93,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return this.ref.child(`/${this.newInstance().path()}`);
   }
 
-  child(path:string):Firebase {
+  child(path:string):firebase.database.Reference {
     return this.list_ref.child(path);
   }
 
@@ -113,10 +113,10 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
-  updateOrCreate(obj:{}, key?:string):FirebaseWithPromise<void> {
+  updateOrCreate(obj:{}, key?:string):firebase.database.ThenableReference {
     if (key) {
       let child = this.list_ref.child(key);
-      return <FirebaseWithPromise<void>>
+      return <firebase.database.ThenableReference>
         Object.assign(child, child.set(obj));
     }
 

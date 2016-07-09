@@ -7,7 +7,7 @@ import {FirebaseConnection} from './firebase.connection';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
-  protected __ref: Firebase;
+  protected __ref: firebase.database.Reference;
   protected _cache: {[key:string]:T} = {};
 
   constructor(
@@ -49,7 +49,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   once(): Promise<T[]> {
-    return this.__ref.once("value").then((snapshot: FirebaseDataSnapshot) => {
+    return this.__ref.once("value").then((snapshot:firebase.database.DataSnapshot) => {
       let val = snapshot.val() || {};
       let items = [];
       for(let key in val) {
@@ -70,7 +70,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return observable;
   }
 
-  push(val: any): FirebaseWithPromise<void> {
+  push(val: any): firebase.database.ThenableReference {
     if(this.other_key) {
       if(val[this.other_key] === undefined) {
         val[this.other_key] = {};
@@ -81,7 +81,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     let ref = super.push(true);
 
     this.related.updateOrCreate(
-      val, ref.key()
+      val, ref.key
     );
 
     return ref;

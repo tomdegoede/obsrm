@@ -1,4 +1,4 @@
-import {BaseModel} from '.';
+import {BaseModel} from './base_model';
 import {Inject, ApplicationRef, OpaqueToken} from "@angular/core";
 import {DatabaseConnection} from './database.connection';
 

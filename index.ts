@@ -1,25 +1,23 @@
-export {BaseModel} from "./base_model";
-export {ModelCollectionObservable} from "./model_collection.interface";
-export {ModelService, ModelsConfig, DatabaseConnectionRef, ModelServiceRef} from "./model.service";
+export {BaseModel} from "./src/base_model";
+export {ModelCollectionObservable} from "./src/model_collection.interface";
+export {ModelService, ModelServiceRef, DatabaseConnectionRef, ModelsConfig} from "./src/model.service";
 
 import {provide, ApplicationRef} from "@angular/core";
 import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
-import {DatabaseConnectionRef, ModelServiceRef} from './model.service';
-import {FirebaseConnection} from './firebase/firebase.connection';
-import {ModelService, ModelsConfig, BaseModel} from '.';
-import {models} from './models';
+import {ModelService, ModelServiceRef, DatabaseConnectionRef, ModelsConfig, BaseModel} from '.';
+import {FirebaseConnection} from './src/firebase/firebase.connection';
+
+// provide(ModelsConfig, {
+//   useValue: models
+// }),
 
 export const MODEL_PROVIDERS:any[] = [
-  provide(ModelsConfig, {
-    useValue: models
-  }),
-
   provide(ModelServiceRef, {
     useClass: ModelService
   }),
 
   provide(DatabaseConnectionRef, {
-    useFactory: (ref:Firebase, app:ApplicationRef, af:AngularFire, ms: ModelService) => {
+    useFactory: (ref:firebase.database.Reference, app:ApplicationRef, af:AngularFire, ms: ModelService) => {
       let cache = {};
 
       // TODO this caches by constructor.toString() which is potentially not always safe

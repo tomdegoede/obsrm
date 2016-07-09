@@ -2,7 +2,7 @@ import {ModelCollectionObservable} from './model_collection.interface';
 import {BaseModel} from './base_model';
 import {Inject, ApplicationRef, OpaqueToken} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
-import {inject} from './inject';
+import {inject} from './helpers/inject';
 import {ModelService, ModelServiceRef} from './model.service';
 
 export abstract class DatabaseConnection<T extends BaseModel<T>> {
