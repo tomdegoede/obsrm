@@ -1,0 +1,23 @@
+{
+  "name": "obsrm",
+  "version": "0.1.0",
+  "description": "Observable ORM wrapper for Firebase, RethinkDB and possibly more",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomdegoede/obsrm.git"
+  },
+  "keywords": [
+    "Observable",
+    "ORM"
+  ],
+  "author": "Tom de Goede",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tomdegoede/obsrm/issues"
+  },
+  "homepage": "https://github.com/tomdegoede/obsrm#readme"
+}
