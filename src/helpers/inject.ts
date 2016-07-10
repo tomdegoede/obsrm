@@ -1,4 +1,5 @@
-import {reflector, Injector} from "@angular/core";
+import {Injector} from "@angular/core";
+import {reflector} from "@angular/core/src/reflection/reflection";
 
 export function inject(type, injector: Injector, additional_arguments?) {
   if(!additional_arguments) {

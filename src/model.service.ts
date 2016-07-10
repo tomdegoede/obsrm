@@ -13,7 +13,7 @@ export interface Relation {
   reverse?: Relation
 }
 
-export abstract class ModelService {
+export class ModelService {
 
   protected relation_pairs: {left: Relation, right: Relation}[];
 

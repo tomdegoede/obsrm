@@ -1,7 +1,8 @@
 import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from "angularfire2";
-import {BaseModel, ModelCollectionObservable} from '../base_model';
+import {BaseModel} from '../base_model';
+import {ModelCollectionObservable} from "../model_collection.interface";
 import {DatabaseConnection} from '../database.connection';
 import {FirebaseConnection} from './firebase.connection';
 

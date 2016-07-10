@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "outDir": "../obsrm",
+    "rootDir": "./",
+    "inlineSources": true,
+    "declaration": true
+  },
+  "files": [
+    "index.ts",
+    "typings/index.d.ts"
+  ]
+}

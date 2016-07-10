@@ -1,5 +1,8 @@
 import {ApplicationRef, Inject, Injectable} from "@angular/core";
-import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
+import {
+  AngularFire, FirebaseRef, FirebaseDatabase, FirebaseListObservable,
+  FirebaseObjectObservable
+} from 'angularfire2/angularfire2';
 import {Observable} from "rxjs";
 
 import {BaseModel} from "../base_model";
@@ -13,7 +16,7 @@ import {Relation, ModelService, ModelServiceRef} from '../model.service';
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
   constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
-              @Inject(FirebaseRef) protected ref:firebase.database.Reference,
+              @Inject(FirebaseRef) protected ref:firebase.app.App,
               protected af:AngularFire, @Inject(ModelServiceRef) protected ms: ModelService) {
     super(app, ms);
   }
@@ -90,24 +93,24 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   get list_ref() {
-    return this.ref.child(`/${this.newInstance().path()}`);
+    return this.ref.database().ref().child(`/${this.newInstance().path()}`);
   }
 
   child(path:string):firebase.database.Reference {
     return this.list_ref.child(path);
   }
 
-  database() {
+  database(): FirebaseDatabase {
     return this.af.database;
   }
 
-  list(path) {
+  list(path):FirebaseListObservable<any> {
     return this.database().list(
       this.child(path)
     );
   }
 
-  object(path) {
+  object(path):FirebaseObjectObservable<any> {
     return this.database().object(
       this.child(path)
     );
