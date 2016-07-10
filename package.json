@@ -1,0 +1,78 @@
+{
+  "_args": [
+    [
+      "obsrm@git+https://git@github.com/tomdegoede/obsrm.git",
+      "C:\\xampp\\htdocs\\angular2-webpack-starter"
+    ]
+  ],
+  "_from": "git+https://git@github.com/tomdegoede/obsrm.git",
+  "_id": "obsrm@0.1.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/obsrm",
+  "_phantomChildren": {},
+  "_requested": {
+    "hosted": {
+      "directUrl": "https://git@raw.githubusercontent.com/tomdegoede/obsrm/master/package.json",
+      "gitUrl": "git://git@github.com/tomdegoede/obsrm.git",
+      "httpsUrl": "git+https://git@github.com/tomdegoede/obsrm.git",
+      "shortcut": "github:tomdegoede/obsrm",
+      "ssh": "git@github.com:tomdegoede/obsrm.git",
+      "sshUrl": "git+ssh://git@github.com/tomdegoede/obsrm.git",
+      "type": "github"
+    },
+    "name": "obsrm",
+    "raw": "obsrm@git+https://git@github.com/tomdegoede/obsrm.git",
+    "rawSpec": "git+https://git@github.com/tomdegoede/obsrm.git",
+    "scope": null,
+    "spec": "git+https://git@github.com/tomdegoede/obsrm.git",
+    "type": "hosted"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "git+https://git@github.com/tomdegoede/obsrm.git#985f254326c7722f100368018a04154280ce2761",
+  "_shasum": "f56c831cc4558fa4af73795b8e5501a6096de095",
+  "_shrinkwrap": null,
+  "_spec": "obsrm@git+https://git@github.com/tomdegoede/obsrm.git",
+  "_where": "C:\\xampp\\htdocs\\angular2-webpack-starter",
+  "author": {
+    "name": "Tom de Goede"
+  },
+  "bugs": {
+    "url": "https://github.com/tomdegoede/obsrm/issues"
+  },
+  "dependencies": {
+    "@angular/common": "2.0.0-rc.4",
+    "@angular/compiler": "2.0.0-rc.4",
+    "@angular/core": "2.0.0-rc.4",
+    "@angular/platform-browser": "2.0.0-rc.4",
+    "@angular/platform-browser-dynamic": "2.0.0-rc.4",
+    "angularfire2": "2.0.0-beta.2",
+    "firebase": "3.0.3",
+    "rxjs": "5.0.0-beta.6",
+    "zone.js": "~0.6.12"
+  },
+  "description": "Observable ORM wrapper for Firebase, RethinkDB and possibly more",
+  "devDependencies": {},
+  "gitHead": "985f254326c7722f100368018a04154280ce2761",
+  "homepage": "https://github.com/tomdegoede/obsrm#readme",
+  "keywords": [
+    "Observable",
+    "ORM"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "obsrm",
+  "optionalDependencies": {},
+  "readme": "# obsrm",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomdegoede/obsrm.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.0"
+}
