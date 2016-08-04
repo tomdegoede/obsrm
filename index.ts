@@ -15,8 +15,6 @@ import {FirebaseConnection} from './src/firebase/firebase.connection';
 // }),
 
 export const MODEL_PROVIDERS:any[] = [
-  {provide: ModelsConfig, useValue: {}},
-
   { provide: ModelServiceRef, useClass: ModelService },
   {
     provide: DatabaseConnectionRef,
