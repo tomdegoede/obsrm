@@ -44,6 +44,9 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
     return o;
   }
 
+  // TODO update logic from collection
+  // TODO horizon authentication
+  // TODO activate routes on login (loading?)
   newInstanceFromObject(obj):T {
     let o = this.newInstance();
     o.setSource(new BehaviorSubject(obj));
