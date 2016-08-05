@@ -10,8 +10,6 @@ export interface Relation {
   reverse?: Relation
 }
 
-console.log(ModelsConfig, "ms");
-
 @Injectable()
 export class ModelService {
 
