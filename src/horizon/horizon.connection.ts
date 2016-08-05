@@ -7,6 +7,7 @@ import {ModelServiceRef} from "../tokens";
 import {Observable, BehaviorSubject} from 'rxjs';
 import {ModelCollectionObservable} from '../model_collection.interface';
 import {HorizonCollection} from "./horizon_collection";
+import {isString} from '@angular/core/src/facade/lang';
 
 @Injectable()
 export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
@@ -69,12 +70,7 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
       obj['id'] = key;
     }
 
-    return this.table().store(obj).subscribe(
-      // Returns id of saved objects
-      result => console.log(result),
-      // Returns server error message
-      error => console.log(error)
-    );
+    return this.table().store(obj).subscribe();
   }
 
   key(model: T): any {
@@ -82,6 +78,10 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
   }
 
   delete(entity: string|T) {
+    if (isString(entity)) {
+      return this.table().remove(entity);
+    }
 
+    return this.table().remove((<T>entity).key());
   }
 }
