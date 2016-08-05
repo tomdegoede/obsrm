@@ -94,7 +94,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   get list_ref() {
-    return this.ref.database().ref().child(`/${this.newInstance().path()}`);
+    return this.ref.database().ref().child(`/${this.type}`);
   }
 
   child(path:string):firebase.database.Reference {
