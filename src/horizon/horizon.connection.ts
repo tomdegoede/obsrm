@@ -4,36 +4,48 @@ import {BaseModel} from "../base_model";
 import {DatabaseConnection} from '../database.connection';
 import {ModelService} from '../model.service';
 import {ModelServiceRef} from "../tokens";
-import {Observable} from 'rxjs';
+import {Observable, BehaviorSubject} from 'rxjs';
 import {ModelCollectionObservable} from '../model_collection.interface';
+import {HorizonCollection} from "./horizon_collection";
 
 @Injectable()
-export class HorizonCnnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
+export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
   constructor(@Inject(ApplicationRef) protected app: ApplicationRef,
               @Inject(ModelServiceRef) protected ms: ModelService, protected horizon) {
     super(app, ms);
   }
 
-  protected table() {
-    return this.horizon(this.type);
+  protected _table;
+
+  table() {
+    return this._table = this._table || this.horizon(this.type);
   }
 
   get(key: string): T {
     return this.newInstanceWithRef(
-      this.child(key)
+      this.child(key), key
     );
   }
 
   protected child(key) {
     return this.table().find({
       id: key
-    }).fetch();
+    }).watch();
   }
 
-  protected newInstanceWithRef(r):T {
+  protected newInstanceWithRef(r, key):T {
     let o = this.newInstance();
+    o.setProperties({
+      id: key
+    });
     o.setSource(r);
+    return o;
+  }
+
+  newInstanceFromObject(obj):T {
+    let o = this.newInstance();
+    o.setSource(new BehaviorSubject(obj));
     return o;
   }
 
@@ -49,11 +61,7 @@ export class HorizonCnnection<T extends BaseModel<T>> extends DatabaseConnection
   }
 
   hasMany<R extends BaseModel<R>>(model: BaseModel<T>, related: DatabaseConnection<R>, other_key: string, local_index?: string): ModelCollectionObservable<R> {
-    let p:any = {};
-
-    p[other_key] = model.key();
-
-    return this.table().findAll(p).fetch();
+    return new HorizonCollection(model, <HorizonConnection<R>>related, other_key, local_index);
   }
 
   updateOrCreate(obj: {id}, key?: any) {
@@ -61,9 +69,12 @@ export class HorizonCnnection<T extends BaseModel<T>> extends DatabaseConnection
       obj['id'] = key;
     }
 
-    return this.table().store([
-      obj
-    ]);
+    return this.table().store(obj).subscribe(
+      // Returns id of saved objects
+      result => console.log(result),
+      // Returns server error message
+      error => console.log(error)
+    );
   }
 
   key(model: T): any {

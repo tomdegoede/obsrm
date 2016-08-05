@@ -1,6 +1,6 @@
 import {ApplicationRef} from '@angular/core';
 import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "obsrm";
-import {HorizonCnnection} from "./horizon.connection";
+import {HorizonConnection} from "./horizon.connection";
 
 import Horizon = require('@horizon/client');
 
@@ -12,6 +12,11 @@ export function ngProvideHorizonConnection(config) {
     // document.querySelector('h1').innerHTML = 'horizon works!'
     console.log('Horizon Ready!');
   });
+
+  horizon.onDisconnected(function() {
+    // document.querySelector('h1').innerHTML = 'horizon works!'
+    console.log('Horizon Disconnected!');
+  });
   horizon.connect();
 
   return {
@@ -20,7 +25,7 @@ export function ngProvideHorizonConnection(config) {
       let cache = {};
 
       return (type: string) => {
-        return cache[type] = cache[type] || (new HorizonCnnection(app, ms, horizon)).setType(type);
+        return cache[type] = cache[type] || (new HorizonConnection(app, ms, horizon)).setType(type);
       };
     },
     deps: [ApplicationRef, ModelServiceRef]
