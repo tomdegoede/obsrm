@@ -49,6 +49,11 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
   // TODO activate routes on login (loading?)
   newInstanceFromObject(obj):T {
     let o = this.newInstance();
+
+    // Have to set properties because the BehaviorSubject will emit next tick. This will cause models to exist without ID.
+    o.setProperties(obj);
+
+    // TODO allow writing to this subject
     o.setSource(new BehaviorSubject(obj));
     return o;
   }
