@@ -50,7 +50,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   once(): Promise<T[]> {
-    return this.__ref.once("value").then((snapshot:firebase.database.DataSnapshot) => {
+    return <Promise<T[]>>this.__ref.once("value").then((snapshot:firebase.database.DataSnapshot) => {
       let val = snapshot.val() || {};
       let items = [];
       for(let key in val) {

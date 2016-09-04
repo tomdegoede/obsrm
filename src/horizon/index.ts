@@ -1,4 +1,4 @@
-import {ApplicationRef} from '@angular/core';
+import {Injector} from '@angular/core';
 import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "obsrm";
 import {HorizonConnection} from "./horizon.connection";
 
@@ -7,7 +7,7 @@ import Horizon = require('@horizon/client');
 export function ngProvideHorizonConnection(config) {
   return {
     provide: DatabaseConnectionRef,
-    useFactory: (app:ApplicationRef, ms: ModelService) => {
+    useFactory: (injector:Injector, ms: ModelService) => {
       // TODO move to service
       var horizon = Horizon(config);
 
@@ -25,9 +25,9 @@ export function ngProvideHorizonConnection(config) {
       let cache = {};
 
       return (type: string) => {
-        return cache[type] = cache[type] || (new HorizonConnection(app, ms, horizon)).setType(type);
+        return cache[type] = cache[type] || (new HorizonConnection(injector, ms, horizon)).setType(type);
       };
     },
-    deps: [ApplicationRef, ModelServiceRef]
+    deps: [Injector, ModelServiceRef]
   };
 }

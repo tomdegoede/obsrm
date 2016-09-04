@@ -1,4 +1,4 @@
-import {ApplicationRef, Inject, Injectable} from "@angular/core";
+import {Injector, Inject, Injectable} from "@angular/core";
 
 import {BaseModel} from "../base_model";
 import {DatabaseConnection} from '../database.connection';
@@ -12,9 +12,9 @@ import {isString} from '@angular/core/src/facade/lang';
 @Injectable()
 export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
-  constructor(@Inject(ApplicationRef) protected app: ApplicationRef,
+  constructor(protected injector: Injector,
               @Inject(ModelServiceRef) protected ms: ModelService, protected horizon) {
-    super(app, ms);
+    super(injector, ms);
   }
 
   protected _table;

@@ -1,5 +1,5 @@
 import {BaseModel} from './base_model';
-import {Inject, Injectable, ApplicationRef, OpaqueToken} from "@angular/core";
+import {Inject, Injectable, Injector} from "@angular/core";
 import {DatabaseConnection} from './database.connection';
 import {ModelsConfig, DatabaseConnectionRef} from "./tokens";
 
@@ -15,7 +15,7 @@ export class ModelService {
 
   protected relation_pairs: {left: Relation, right: Relation}[];
 
-  constructor(@Inject(ApplicationRef) protected app:ApplicationRef, @Inject(ModelsConfig) protected models_config) {
+  constructor(protected injector:Injector, @Inject(ModelsConfig) protected models_config) {
     // 1.2 <3> 4.5
     this.relation_pairs = models_config.relations.map(relation => {
       return relation.match(/([^\.\s]+)\.([^\.\s]+)\s*(\<?\>?|=)\s*([^\.\s]+)\.([^\.\s]+)/);
@@ -47,7 +47,7 @@ export class ModelService {
   }
 
   public model<R extends BaseModel<R>>(type: string): DatabaseConnection<R> {
-    return this.app.injector.get(DatabaseConnectionRef)(type);
+    return this.injector.get(DatabaseConnectionRef)(type);
   }
 
   public getClass(type: string) {

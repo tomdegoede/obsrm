@@ -1,4 +1,4 @@
-import {ApplicationRef, Inject, Injectable} from "@angular/core";
+import {Injector, Inject, Injectable} from "@angular/core";
 import {
   AngularFire, FirebaseRef, FirebaseDatabase, FirebaseListObservable,
   FirebaseObjectObservable
@@ -16,10 +16,10 @@ import {ModelServiceRef} from "../tokens";
 @Injectable()
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
 
-  constructor(@Inject(ApplicationRef) protected app:ApplicationRef,
+  constructor(protected injector:Injector,
               @Inject(FirebaseRef) protected ref:firebase.app.App,
               protected af:AngularFire, @Inject(ModelServiceRef) protected ms: ModelService) {
-    super(app, ms);
+    super(injector, ms);
   }
 
   get(key:string):T {
