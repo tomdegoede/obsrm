@@ -21,7 +21,7 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     //   .map(changes => this.processRawChanges(changes));
 
     this.source = related.table().findAll(p).watch()
-      .map(collection => this.processCollection(collection));
+      .map(collection => this.processCollection(collection)).share();
   }
 
   private _collection = [];
