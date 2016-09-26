@@ -88,6 +88,10 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return this.service.hasMany<R>(this, related, other_key, local_index);
   }
 
+  save() {
+    this.service.updateOrCreate(this.properties, this.key());
+  }
+
   delete() {
     return this.service.delete(this.typed);
   }
