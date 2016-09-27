@@ -8,20 +8,28 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
   protected _cache: {[key:string]:T} = {};
   protected value: T[] = [];
 
-  constructor(protected model: BaseModel<any>, protected related: HorizonConnection<T>, protected other_key: string, protected local_index?: string) {
+  constructor(protected model: BaseModel<any>, protected related: HorizonConnection<T>, protected other_key: string, protected local_index?: string, protected wheres: {[key:string]:any} = {}) {
     super();
 
-    let p:any = {};
-
-    p[other_key] = model.key();
+    wheres[other_key] = model.key();
 
     // this.source = related.table().findAll(p).watch({
     //   rawChanges: true
     // })
     //   .map(changes => this.processRawChanges(changes));
 
-    this.source = related.table().findAll(p).watch()
+    this.source = related.table().findAll(wheres).watch()
       .map(collection => this.processCollection(collection)).share();
+  }
+
+  where(where: {[key:string]:any}): HorizonCollection<T> {
+    let w = this.wheres;
+
+    for(var key in where) {
+      w[key] = where[key];
+    }
+
+    return new HorizonCollection(this.model, this.related, this.other_key, this.local_index, w);
   }
 
   private _collection = [];

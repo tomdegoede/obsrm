@@ -15,13 +15,19 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     protected model:BaseModel<any>,
     protected related:DatabaseConnection<T>,
     protected other_key:string,
-    protected local_index?:string
+    protected local_index?:string,
+    protected wheres: {[key:string]:any} = {}
   ) {
     super(FirebaseConnection.getRef(model).child(local_index));
     this.__ref = FirebaseConnection.getRef(model).child(local_index);
 
     this.source = FirebaseListFactory(this.__ref)
       .map(collection => this.processCollection(collection));
+  }
+
+  // TODO implement
+  where(where: {[key:string]:any}): FirebaseCollection<T> {
+    return this;
   }
 
   protected processCollection(collection) {
