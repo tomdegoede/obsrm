@@ -54,7 +54,7 @@
     "angularfire2": "2.0.0-beta.2",
     "firebase": "3.0.3",
     "rxjs": "5.0.0-beta.6||5.0.0-beta.11",
-    "zone.js": "~0.6.12"
+    "zone.js": "^0.6.21"
   },
   "description": "Observable ORM wrapper for Firebase, RethinkDB and possibly more",
   "devDependencies": {},

@@ -54,7 +54,13 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   }
 
   key() {
-    return this.service.key(this.typed);
+    let key = this.service.key(this.typed);
+
+    if(!key) {
+      console.log('Missing model Key! Probably because the model is obtained trough first() on a collection which requires a subscription before the ID is known.');
+    }
+
+    return key;
   }
 
   // Not sure why I can't just cast <T>this

@@ -11,14 +11,14 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
   constructor(protected model: BaseModel<any>, protected related: HorizonConnection<T>, protected other_key: string, protected local_index?: string, protected wheres: {[key:string]:any} = {}) {
     super();
 
-    wheres[other_key] = model.key();
+    this.wheres[other_key] = model.key();
 
     // this.source = related.table().findAll(p).watch({
     //   rawChanges: true
     // })
     //   .map(changes => this.processRawChanges(changes));
 
-    this.source = related.table().findAll(wheres).watch()
+    this.source = related.table().findAll(this.wheres).watch()
       .map(collection => this.processCollection(collection)).share();
   }
 
@@ -30,6 +30,12 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     }
 
     return new HorizonCollection(this.model, this.related, this.other_key, this.local_index, w);
+  }
+
+  first(): T {
+    return <T>this.related.newInstance().setSource(
+      this.related.table().find(this.wheres).watch().map()
+    );
   }
 
   private _collection = [];
