@@ -33,7 +33,9 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
   }
 
   getFirst(): Promise<T> {
-    let w = <Observable<any>>this.related.table().find(this.wheres).watch();
+    let w = Observable.from(
+      this.related.table().find(this.wheres).watch()
+    );
 
     return w.map<T>(properties => {
       let i = this.related.newInstance();
