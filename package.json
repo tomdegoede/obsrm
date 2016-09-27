@@ -47,7 +47,7 @@
 
     "@horizon/client": "^2.0.0",
 
-    "angularfire2": "2.0.0-beta.2",
+    "angularfire2": "2.0.0-beta.5",
     "firebase": "3.0.3"
   },
   "description": "Observable ORM wrapper for Firebase, RethinkDB and possibly more",

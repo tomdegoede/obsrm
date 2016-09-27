@@ -31,8 +31,8 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   // TODO implement
-  getFirst(): T {
-    return this.related.get('');
+  getFirst(): Promise<T> {
+    return <Promise<T>>this.related.get('').take(1).toPromise();
   }
 
   protected processCollection(collection) {

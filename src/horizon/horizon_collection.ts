@@ -32,10 +32,16 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     return new HorizonCollection(this.model, this.related, this.other_key, this.local_index, w);
   }
 
-  getFirst(): T {
-    return <T>this.related.newInstance().setSource(
-      this.related.table().find(this.wheres).watch()
-    );
+  getFirst(): Promise<T> {
+    let w = <Observable<any>>this.related.table().find(this.wheres).watch();
+
+    return w.map<T>(properties => {
+      let i = this.related.newInstance();
+      i.setProperties(properties);
+      i.setSource(w);
+
+      return i;
+    }).take(1).toPromise();
   }
 
   private _collection = [];
