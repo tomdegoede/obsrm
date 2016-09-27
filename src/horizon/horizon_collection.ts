@@ -73,8 +73,8 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
 
   push(new_entry: any) {
     if(new_entry instanceof BaseModel) {
-      if(new_entry.p.id) {
-        this._cache[new_entry.p.id] = new_entry;
+      if(new_entry.p['id']) {
+        this._cache[new_entry.p['id']] = <T>new_entry;
       }
 
       new_entry = new_entry.p;

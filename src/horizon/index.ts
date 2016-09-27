@@ -1,5 +1,5 @@
-import {Injector} from '@angular/core';
-import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "obsrm";
+import {Injector, OpaqueToken} from '@angular/core';
+import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "../../";
 import {HorizonConnection} from "./horizon.connection";
 
 import Horizon = require('@horizon/client');
