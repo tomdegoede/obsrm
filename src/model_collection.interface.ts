@@ -5,4 +5,5 @@ export interface ModelCollectionObservable<T> extends Observable<T[]> {
   once(): Promise<T[]>;
   remove(key);
   where(where: {[key:string]:any}): ModelCollectionObservable<T>;
+  getFirst(): T;
 }

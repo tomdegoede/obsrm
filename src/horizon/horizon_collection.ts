@@ -32,7 +32,7 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     return new HorizonCollection(this.model, this.related, this.other_key, this.local_index, w);
   }
 
-  first(): T {
+  getFirst(): T {
     return <T>this.related.newInstance().setSource(
       this.related.table().find(this.wheres).watch().map()
     );

@@ -30,6 +30,11 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return this;
   }
 
+  // TODO implement
+  getFirst(): T {
+    return this.related.get('');
+  }
+
   protected processCollection(collection) {
     let keys = {};
 
