@@ -8,10 +8,7 @@
     "outDir": "../node_modules/obsrm",
     "rootDir": "./",
     "inlineSources": true,
-    "declaration": true,
-    "types": [
-      "firebase"
-    ]
+    "declaration": true
   },
   "files": [
     "index.ts",
