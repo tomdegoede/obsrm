@@ -5,13 +5,14 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "outDir": "../node_modules/obsrm",
+    "outDir": "dist",
     "rootDir": "./",
     "inlineSources": true,
     "declaration": true
   },
-  "files": [
+  "filesGlob": [
     "index.ts",
+    "src/**/*",
     "typings/index.d.ts"
   ]
 }

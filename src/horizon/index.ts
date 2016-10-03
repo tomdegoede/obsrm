@@ -2,7 +2,7 @@ import {Injector, OpaqueToken} from '@angular/core';
 import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "../../";
 import {HorizonConnection} from "./horizon.connection";
 
-import Horizon = require('@horizon/client');
+import * as Horizon from "@horizon/client";
 
 export function ngProvideHorizonConnection(config) {
   return {
@@ -11,12 +11,12 @@ export function ngProvideHorizonConnection(config) {
       // TODO move to service
       var horizon = Horizon(config);
 
-      horizon.onReady(function() {
+      horizon.onReady().subscribe(function() {
         // document.querySelector('h1').innerHTML = 'horizon works!'
         console.log('Horizon Ready!');
       });
 
-      horizon.onDisconnected(function() {
+      horizon.onDisconnected().subscribe(function() {
         // document.querySelector('h1').innerHTML = 'horizon works!'
         console.log('Horizon Disconnected!');
       });

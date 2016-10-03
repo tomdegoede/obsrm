@@ -1,4 +1,5 @@
 {
+  "name": "@stekker/obsrm",
   "author": {
     "name": "Tom de Goede"
   },
@@ -22,13 +23,14 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "name": "obsrm",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tomdegoede/obsrm.git"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "postbuild": "cp package.json dist"
   },
   "version": "0.1.0"
 }
