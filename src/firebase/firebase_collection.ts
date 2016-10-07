@@ -9,6 +9,7 @@ import {FirebaseConnection} from './firebase.connection';
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
   protected __ref: firebase.database.Reference;
+  protected __query: firebase.database.Reference|firebase.database.Query;
   protected _cache: {[key:string]:T} = {};
 
   constructor(
@@ -19,20 +20,40 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     protected wheres: {[key:string]:any} = {}
   ) {
     super(FirebaseConnection.getRef(model).child(local_index));
-    this.__ref = FirebaseConnection.getRef(model).child(local_index);
+    this.__ref = this.__query = FirebaseConnection.getRef(model).child(local_index);
 
-    this.source = FirebaseListFactory(this.__ref)
+
+
+    let has_where;
+    for(let key in wheres) {
+      if(has_where) {
+        console.log('Adding multiple wheres to a firebase query is not possible');
+      }
+      this.__query = this.__ref.orderByChild(key).equalTo(wheres[key] === undefined ? null : wheres[key]);
+    }
+
+    this.source = FirebaseListFactory(this.__query)
       .map(collection => this.processCollection(collection));
   }
 
-  // TODO implement
   where(where: {[key:string]:any}): FirebaseCollection<T> {
-    return this;
+    let w = this.wheres;
+
+    for(let key in where) {
+      w[key] = where[key];
+    }
+
+    return new FirebaseCollection(this.model, this.related, this.other_key, this.local_index, w);
   }
 
-  // TODO implement
   getFirst(): Promise<T> {
-    return <Promise<T>>this.related.get('').take(1).toPromise();
+    return new Promise((resolve, reject) => {
+      this.__ref.limitToFirst(1).once('child_added', function (snapshot, prevKey) {
+        resolve(
+          this.related.get(snapshot.val())
+        );
+      });
+    });
   }
 
   protected processCollection(collection) {
