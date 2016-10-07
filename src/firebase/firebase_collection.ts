@@ -47,10 +47,12 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   }
 
   getFirst(): Promise<T> {
+    let related = this.related;
+
     return new Promise((resolve, reject) => {
       this.__ref.limitToFirst(1).once('child_added', function (snapshot, prevKey) {
         resolve(
-          this.related.get(snapshot.val())
+          related.get(snapshot.val())
         );
       });
     });
