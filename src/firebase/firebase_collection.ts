@@ -105,13 +105,19 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return observable;
   }
 
-  push(val: any): firebase.database.ThenableReference {
+  protected setOtherKey(val) {
     if(this.other_key) {
       if(val[this.other_key] === undefined) {
         val[this.other_key] = {};
       }
       val[this.other_key][this.model.key()] = true;
     }
+
+    return val;
+  }
+
+  push(val: any): firebase.database.ThenableReference {
+    val = this.setOtherKey(val);
 
     let ref = super.push(true);
 
@@ -120,6 +126,18 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     );
 
     return ref;
+  }
+
+  updateOrPush(val: any, key?) {
+    if(!key) {
+      return this.push(val);
+    }
+
+    val = this.setOtherKey(val);
+
+    this.__ref.child(key).set(true);
+
+    return this.related.updateOrCreate(val, key);
   }
 
   remove(key: string) {

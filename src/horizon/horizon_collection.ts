@@ -92,8 +92,7 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     return this.value;
   }
 
-
-  push(new_entry: any) {
+  protected parsePushEntry(new_entry: any) {
     if(new_entry instanceof BaseModel) {
       if(new_entry.p['id']) {
         this._cache[new_entry.p['id']] = <T>new_entry;
@@ -106,9 +105,25 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
       new_entry[this.other_key] = this.model.key();
     }
 
+    return new_entry;
+  }
+
+  push(new_entry: any) {
+    new_entry = this.parsePushEntry(new_entry);
+
     return this.related.updateOrCreate(
       new_entry
     );
+  }
+
+  updateOrPush(val: any, key?) {
+    if(!key) {
+      return this.push(val);
+    }
+
+    val = this.parsePushEntry(val);
+
+    return this.related.updateOrCreate(val, key);
   }
 
   splice(index, howmany, ...items) {
@@ -116,6 +131,7 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     return this.value.splice(index, howmany, ...items);
   }
 
+  // TODO implement
   once(): Promise<T[]> {
     return new Promise<T[]>((resolve, reject) => {
       resolve([]);
