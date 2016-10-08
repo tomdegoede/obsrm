@@ -32,11 +32,11 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return this.relation_objects;
   }
 
-  getRelation(key) {
-    if(this.relation_objects[key] === undefined) {
-      return null;
-    }
+  getProperty(key) {
+    return this.properties[key];
+  }
 
+  getRelation(key) {
     return this.relation_objects[key];
   }
 
