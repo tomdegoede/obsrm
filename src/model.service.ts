@@ -7,7 +7,8 @@ export interface Relation {
   model: string
   call: string
   related: string
-  reverse?: Relation
+  reverse?: Relation,
+  type: 'many' | 'one'
 }
 
 @Injectable()
@@ -23,13 +24,15 @@ export class ModelService {
       let left: Relation = {
         model: relation[1],
         call: relation[2],
-        related: relation[4]
+        related: relation[4],
+        type: relation[3].indexOf(">") !== -1 ? 'many' : 'one'
       };
 
       let right: Relation = {
         model: relation[4],
         call: relation[5],
         related: relation[1],
+        type: relation[3].indexOf("<") !== -1 ? 'many' : 'one',
         reverse: left
       };
 
