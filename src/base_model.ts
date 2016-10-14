@@ -5,7 +5,7 @@ import {DatabaseConnection} from './database.connection';
 import {ModelCollectionObservable} from './model_collection.interface';
 import {Inject} from '@angular/core';
 
-export type RelationObservable = ModelCollectionObservable<any> | BaseModel<any> | Observable<any>;
+export type RelationObservable = ModelCollectionObservable<any> | BaseModel<any>;// | Observable<any>;
 
 // TODO separate relations & properties for FireBase storage
 export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
@@ -40,6 +40,26 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   getRelation(key) {
     return this.relation_objects[key];
+  }
+
+  getManyRelation(key): ModelCollectionObservable<any> {
+    let r = this.getRelation(key);
+
+    if(r instanceof BaseModel) {
+      console.warn(`Calling getManyRelation ${key} on ${this.path()} while it is defined as a hasOne relationship`);
+    }
+
+    return <ModelCollectionObservable<any>>r;
+  }
+
+  getOneRelation(key): BaseModel<any> {
+    let r = this.getRelation(key);
+
+    if(!(r instanceof BaseModel)) {
+      console.warn(`Calling getOneRelation ${key} on ${this.path()} while it is defined as a hasMany relationship`);
+    }
+
+    return <BaseModel<any>>r;
   }
 
   public getRelations(): Relation[] {
