@@ -73,6 +73,10 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
     return new HorizonCollection(model, <HorizonConnection<R>>related, other_key, local_index);
   }
 
+  hasOne(model: BaseModel<T>, related: string, call: string) {
+    throw "TODO implement hasOne for Horizon OBSRM";
+  }
+
   updateOrCreate(obj: {id}, key?: any) {
     if(key) {
       obj['id'] = key;

@@ -9,7 +9,7 @@ import {BaseModel} from "../base_model";
 import {ModelCollectionObservable} from "../model_collection.interface";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseConnection} from '../database.connection';
-import {isString} from '@angular/core/src/facade/lang';
+import {isString, isArray} from '@angular/core/src/facade/lang';
 import {Relation, ModelService} from '../model.service';
 import {ModelServiceRef} from "../tokens";
 
@@ -48,20 +48,34 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
+  hasOne(model: BaseModel<T>, related: string, call: string) {
+    return model.map(model => {
+      if(!model.p[call]) {
+        return new Observable(() => {});
+      }
+
+      return this.ms.model<any>(related)
+        .get(
+          Object.keys(model.p[call])[0]
+        );
+    }).mergeAll();
+  }
+
   key(model:T):any {
     return FirebaseConnection.getRef(model).key;
   }
 
-  protected disableReverse(model:T, relation:Relation):Promise<any> {
-    let promise = model.r[relation.call].once();
-
-    promise.then((collection:BaseModel<any>[]) => {
-      return collection.forEach(
-        related => related.r[relation.reverse.call].remove(model.key())
-      );
+  protected disableReverse(model:T, relation:Relation):Observable<any> {
+    return model.r[relation.call].take(1).map(r => {
+      if(isArray(r)) {
+        return r.forEach(
+          related => related.r[relation.reverse.call].remove(model.key())
+        );
+      } else if (r instanceof BaseModel) {
+        // TODO implement
+        throw "TODO implement disableReverse for Firebase HasOne Relation";
+      }
     });
-
-    return promise;
   }
 
   delete(entity:T | string) {
@@ -73,14 +87,14 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
     let key = model.key();
 
-    let promises:Promise<any>[] = model.getRelations().map<Promise<any>>(
+    let observables:Observable<any>[] = model.getRelations().map(
       relation => this.disableReverse(model, relation)
     );
 
-    return Promise.all(promises).then(
+    Observable.combineLatest(...observables).subscribe(() => {
       // TODO soft delete
-      () => FirebaseConnection.getRef(model).remove()
-    );
+      FirebaseConnection.getRef(model).remove();
+    });
   }
 
   static getRef(model:BaseModel<any>):firebase.database.Reference {

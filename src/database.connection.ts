@@ -28,6 +28,8 @@ export abstract class DatabaseConnection<T extends BaseModel<T>> {
     other_key: string,
     local_index?: string): ModelCollectionObservable<R>;
 
+  abstract hasOne(model: BaseModel<T>, related: string, call: string);
+
   abstract updateOrCreate(obj:{}, key?:any);
 
   abstract key(model: T): any;

@@ -5,11 +5,13 @@ import {DatabaseConnection} from './database.connection';
 import {ModelCollectionObservable} from './model_collection.interface';
 import {Inject} from '@angular/core';
 
+export type RelationObservable = ModelCollectionObservable<any> | BaseModel<any> | Observable<any>;
+
 // TODO separate relations & properties for FireBase storage
 export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   protected relations: Relation[] = [];
-  protected relation_objects: {[key:string]:ModelCollectionObservable<any>} = {};
+  protected relation_objects: {[key:string]:RelationObservable} = {};
   protected properties: {[key:string]:any} = {};
   source_object: any;
 
@@ -28,7 +30,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   }
 
   // TODO more genericly typed
-  get r(): {[key:string]:ModelCollectionObservable<any>} {
+  get r(): {[key:string]:RelationObservable} {
     return this.relation_objects;
   }
 
@@ -74,8 +76,16 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     this.source = this.service.newObservable(this.typed);
 
     // TODO cleaner way to process relations
-    this.relation_objects = this.getRelations().reduce<{[key:string]:ModelCollectionObservable<any>}>((relation_objects, relation) => {
-      relation_objects[relation.call] = this.hasMany(this.ms.model<any>(relation.related), relation.reverse.call, relation.call);
+    this.relation_objects = this.getRelations().reduce<{[key:string]:RelationObservable}>((relation_objects, relation) => {
+      switch (relation.type) {
+        case 'one':
+          relation_objects[relation.call] = this.hasOne(relation);
+          break;
+        case 'many':
+          relation_objects[relation.call] = this.hasMany(this.ms.model<any>(relation.related), relation.reverse.call, relation.call);
+          break;
+      }
+
       return relation_objects;
     }, {});
 
@@ -92,6 +102,10 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     other_key: string,
     local_index?: string): ModelCollectionObservable<R> {
     return this.service.hasMany<R>(this, related, other_key, local_index);
+  }
+
+  hasOne(relation: Relation) {
+    return this.service.hasOne(this, relation.related, relation.call);
   }
 
   save() {
