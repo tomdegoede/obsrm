@@ -12,6 +12,7 @@ import {DatabaseConnection} from '../database.connection';
 import {isString, isArray} from '@angular/core/src/facade/lang';
 import {Relation, ModelService} from '../model.service';
 import {ModelServiceRef} from "../tokens";
+import {MultiLocationUpdate} from './multi_location_update';
 
 @Injectable()
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
@@ -71,19 +72,6 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return FirebaseConnection.getRef(model).key;
   }
 
-  protected disableReverse(model:T, relation:Relation):Observable<any> {
-    return model.r[relation.call].take(1).map(r => {
-      if(isArray(r)) {
-        return r.forEach(
-          related => related.r[relation.reverse.call].remove(model.key())
-        );
-      } else if (r instanceof BaseModel) {
-        // TODO implement
-        throw "TODO implement disableReverse for Firebase HasOne Relation";
-      }
-    });
-  }
-
   delete(entity:T | string) {
     if (isString(entity)) {
       entity = this.get(<string>entity);
@@ -91,15 +79,39 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
     let model:T = <T>entity;
 
-    let key = model.key();
+    let upd = new MultiLocationUpdate(this.ref.database().ref());
 
-    let observables:Observable<any>[] = model.getRelations().map(
-      relation => this.disableReverse(model, relation)
-    );
+    upd.add(FirebaseConnection.getRef(model), null);
 
-    Observable.combineLatest(...observables).subscribe(() => {
-      // TODO soft delete
-      FirebaseConnection.getRef(model).remove();
+    let deletes: Observable<firebase.database.Reference[]>[] = model.getRelations().map(relation => {
+      return model.r[relation.call].take(1).map(related => {
+        if(isArray(related)) {
+          return related.map(related_model => {
+            return FirebaseConnection.getRef(related_model).child('r').child(relation.reverse.call).child(model.key());
+          });
+        } else if(related instanceof BaseModel) {
+          return [
+            FirebaseConnection.getRef(related).child('r').child(relation.reverse.call).child(model.key())
+          ];
+        } else {
+          throw "Unknown relation value." + JSON.stringify(related);
+        }
+      });
+    });
+
+    let related_refs = Observable.combineLatest(...deletes)
+      .map((refs: firebase.database.Reference[][]) => {
+        return refs.reduce((total, refs) => {
+          return total.concat(refs);
+        }, []);
+      });
+
+    related_refs.take(1).subscribe(refs => {
+      refs.map(ref => {
+        upd.add(ref, null);
+      });
+
+      upd.update();
     });
   }
 
