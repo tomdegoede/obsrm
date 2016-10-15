@@ -5,6 +5,8 @@ import {BaseModel} from '../base_model';
 import {ModelCollectionObservable} from "../model_collection.interface";
 import {DatabaseConnection} from '../database.connection';
 import {FirebaseConnection} from './firebase.connection';
+import {MultiLocationUpdate} from './multi_location_update';
+import {ThenableReference} from './thenable_reference';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
@@ -19,10 +21,8 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     protected local_index?:string,
     protected wheres: {[key:string]:any} = {}
   ) {
-    super(FirebaseConnection.getRef(model).child(local_index));
-    this.__ref = this.__query = FirebaseConnection.getRef(model).child(local_index);
-
-
+    super(FirebaseConnection.getRef(model).child('r').child(local_index));
+    this.__ref = this.__query = FirebaseConnection.getRef(model).child('r').child(local_index);
 
     let has_where;
     for(let key in wheres) {
@@ -105,39 +105,34 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return observable;
   }
 
-  protected setOtherKey(val) {
+  push(val: any) {
+    return this.updateOrPush(val);
+  }
+
+  updateOrPush(val: any, key?): firebase.database.ThenableReference {
+    let upd = new MultiLocationUpdate(this.__ref.root);
+    let related: FirebaseConnection<T> = <FirebaseConnection<T>>this.related;
+
+    // Pushing undefined will not require rollback but will create a key
+    let ref = key ? this.__ref.child(key) : super.push(undefined);
+
+    let related_ref = related.list_ref.child(ref.key).child('p');
+
+    // Set true for own collection
+    upd.add(ref, true);
+
+    // Add val to properties
+    upd.add(related_ref, val);
+
+    // Add reverse relation key to new model
     if(this.other_key) {
-      if(val[this.other_key] === undefined) {
-        val[this.other_key] = {};
-      }
-      val[this.other_key][this.model.key()] = true;
+      let relation_ref = related
+        .child(`${ref.key}/r/${this.other_key}/${this.model.key()}`);
+
+      upd.add(relation_ref, true);
     }
 
-    return val;
-  }
-
-  push(val: any): firebase.database.ThenableReference {
-    val = this.setOtherKey(val);
-
-    let ref = super.push(true);
-
-    this.related.updateOrCreate(
-      val, ref.key
-    );
-
-    return ref;
-  }
-
-  updateOrPush(val: any, key?) {
-    if(!key) {
-      return this.push(val);
-    }
-
-    val = this.setOtherKey(val);
-
-    this.__ref.child(key).set(true);
-
-    return this.related.updateOrCreate(val, key);
+    return new ThenableReference(upd.update(), ref);
   }
 
   remove(key: string) {

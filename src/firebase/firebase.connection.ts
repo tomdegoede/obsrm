@@ -30,7 +30,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
   newObservable(model:T):Observable<T> {
     return this.database().object(
-      FirebaseConnection.getRef(model)
+      FirebaseConnection.getRef(model).child('p')
     ).map(properties => {
       return model
         .setProperties(properties);
@@ -49,15 +49,21 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   }
 
   hasOne(model: BaseModel<T>, related: string, call: string) {
-    return model.map(model => {
-      if(!model.p[call]) {
-        return new Observable(() => {});
+    return this.database().object(
+      FirebaseConnection.getRef(model).child(`r/${call}`)
+    ).map(model => {
+      delete model.$key;
+      delete model.$value;
+      delete model.$exists;
+
+      let keys = Object.keys(model);
+
+      if(!keys.length) {
+        return Observable.empty();
       }
 
       return this.ms.model<any>(related)
-        .get(
-          Object.keys(model.p[call])[0]
-        );
+        .get(keys[0]);
     }).mergeAll();
   }
 
@@ -101,6 +107,21 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return model.source_object;
   }
 
+  static getPath(ref: firebase.database.Reference) {
+    if(!ref || !ref.key) {
+      return;
+    }
+
+    let d = [ref.key];
+    let p = FirebaseConnection.getPath(ref.parent);
+
+    if(p) {
+      d.unshift(p);
+    }
+
+    return [p, ref.key].join('/');
+  }
+
   protected newInstanceWithRef(r:firebase.database.Reference):T {
     let o = this.newInstance();
     o.setSource(r);
@@ -133,11 +154,13 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
   updateOrCreate(obj:{}, key?:string):firebase.database.ThenableReference {
     if (key) {
-      let child = this.list_ref.child(key);
+      let child = this.child(key).child('p');
       return <firebase.database.ThenableReference>
         Object.assign(child, child.set(obj));
     }
 
-    return this.list_ref.push(obj);
+    return this.list_ref.push({
+      p: obj
+    });
   }
 }
