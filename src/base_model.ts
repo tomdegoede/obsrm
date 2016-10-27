@@ -129,7 +129,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   }
 
   save() {
-    this.service.updateOrCreate(this.properties, this.key());
+    return this.service.updateOrCreate(this.properties, this.key());
   }
 
   delete() {

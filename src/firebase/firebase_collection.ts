@@ -105,11 +105,11 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return observable;
   }
 
-  push(val: any) {
+  push(val: any): any /** Needed since return type of parent does not match */ {
     return this.updateOrPush(val);
   }
 
-  updateOrPush(val: any, key?): firebase.database.ThenableReference {
+  updateOrPush(val: any, key?): Promise<T> {
     let upd = new MultiLocationUpdate(this.__ref.root);
     let related: FirebaseConnection<T> = <FirebaseConnection<T>>this.related;
 
@@ -132,7 +132,13 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
       upd.add(relation_ref, true);
     }
 
-    return new ThenableReference(upd.update(), ref);
+    upd.update();
+
+    return new Promise((done) => {
+      let instance = this.related.newInstance();
+      instance.setSource(related_ref.parent);
+      done(instance);
+    });
   }
 
   remove(key: string) {
