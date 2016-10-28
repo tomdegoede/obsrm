@@ -29,10 +29,20 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
+  private static processProperties(properties) {
+    delete properties.$key;
+    delete properties.$value;
+    delete properties.$exists;
+
+    return properties;
+  }
+
   newObservable(model:T):Observable<T> {
     return this.database().object(
       FirebaseConnection.getRef(model).child('p')
     ).map(properties => {
+      properties = FirebaseConnection.processProperties(properties);
+
       return model
         .setProperties(properties);
     });
@@ -53,9 +63,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return this.database().object(
       FirebaseConnection.getRef(model).child(`r/${call}`)
     ).map(model => {
-      delete model.$key;
-      delete model.$value;
-      delete model.$exists;
+      model = FirebaseConnection.processProperties(model);
 
       let keys = Object.keys(model);
 
