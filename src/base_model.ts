@@ -43,23 +43,31 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   }
 
   getManyRelation(key): ModelCollectionObservable<any> {
-    let r = this.getRelation(key);
+    let relation = this.ms.getRelation(this.path(), key);
 
-    if(r instanceof BaseModel) {
-      console.warn(`Calling getManyRelation ${key} on ${this.path()} while it is defined as a hasOne relationship`);
+    if(relation) {
+      if(relation.type !== 'many') {
+        console.warn(`Calling getManyRelation ${key} on ${this.path()} while it is defined as a ${relation.type} relationship`);
+      }
+    } else {
+      console.warn(`Calling getManyRelation ${key} on ${this.path()} but the relation is not defined`);
     }
 
-    return <ModelCollectionObservable<any>>r;
+    return <ModelCollectionObservable<any>>this.getRelation(key);
   }
 
   getOneRelation(key): BaseModel<any> {
-    let r = this.getRelation(key);
+    let relation = this.ms.getRelation(this.path(), key);
 
-    if(!(r instanceof BaseModel)) {
-      console.warn(`Calling getOneRelation ${key} on ${this.path()} while it is defined as a hasMany relationship`);
+    if(relation) {
+      if(relation.type !== 'one') {
+        console.warn(`Calling getOneRelation ${key} on ${this.path()} while it is defined as a ${relation.type} relationship`);
+      }
+    } else {
+      console.warn(`Calling getOneRelation ${key} on ${this.path()} but the relation is not defined`);
     }
 
-    return <BaseModel<any>>r;
+    return <BaseModel<any>>this.getRelation(key);
   }
 
   public getRelations(): Relation[] {

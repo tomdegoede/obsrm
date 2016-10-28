@@ -70,4 +70,18 @@ export class ModelService {
       return relations;
     }, []);
   }
+
+  public getRelation(path: string, call: string): Relation {
+    for(let i in this.relation_pairs) {
+      let relation_pair = this.relation_pairs[i];
+
+      if(relation_pair.left.model === path && relation_pair.left.call === call) {
+        return relation_pair.left;
+      }
+
+      if(relation_pair.right.model === path && relation_pair.right.call === call) {
+        return relation_pair.right;
+      }
+    }
+  }
 }
