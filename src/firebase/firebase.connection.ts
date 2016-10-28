@@ -68,12 +68,12 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
       let keys = Object.keys(model);
 
       if(!keys.length) {
-        return Observable.empty();
+        return Observable.from([null]);
       }
 
       return this.ms.model<any>(related)
         .get(keys[0]);
-    }).mergeAll();
+    }).switch();
   }
 
   key(model:T):any {
