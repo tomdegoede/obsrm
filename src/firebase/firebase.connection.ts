@@ -1,7 +1,6 @@
 import {Injector, Inject, Injectable} from "@angular/core";
 import {
-  AngularFire, FirebaseRef, FirebaseDatabase, FirebaseListObservable,
-  FirebaseObjectObservable
+  AngularFire, FirebaseRef, FirebaseDatabase, FirebaseListObservable, FirebaseObjectObservable
 } from 'angularfire2';
 import {Observable} from "rxjs";
 
@@ -59,7 +58,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
-  hasOne(model: BaseModel<T>, related: string, call: string) {
+  hasOne(model: BaseModel<T>, related: string, call: string): Observable<BaseModel<any>> {
     return this.database().object(
       FirebaseConnection.getRef(model).child(`r/${call}`)
     ).map(model => {
@@ -176,10 +175,10 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
-  updateOrCreate(obj:{}, key?:string):firebase.database.ThenableReference {
+  updateOrCreate(obj:{}, key?:string):Promise<any> {
     if (key) {
       let child = this.child(key).child('p');
-      return <firebase.database.ThenableReference>
+      return <Promise<any>>
         Object.assign(child, child.set(obj));
     }
 

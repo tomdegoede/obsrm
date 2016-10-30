@@ -56,7 +56,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return <ModelCollectionObservable<any>>this.getRelation(key);
   }
 
-  getOneRelation(key): BaseModel<any> {
+  getOneRelation(key): Observable<BaseModel<any>> {
     let relation = this.ms.getRelation(this.path(), key);
 
     if(relation) {
