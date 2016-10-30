@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/tomdegoede/obsrm/issues"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@angular/core": "^2.0.0",
     "@horizon/client": "^2.0.0",
     "angularfire2": "2.0.0-beta.5",
