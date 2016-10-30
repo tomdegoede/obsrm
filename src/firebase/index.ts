@@ -1,5 +1,5 @@
 import {Injector, OpaqueToken} from "@angular/core";
-import {AngularFire, FirebaseRef} from 'angularfire2/angularfire2';
+import {AngularFire, FirebaseRef} from 'angularfire2';
 import {ModelServiceRef, ModelService, DatabaseConnectionRef} from "../../";
 import {FirebaseConnection} from './firebase.connection';
 

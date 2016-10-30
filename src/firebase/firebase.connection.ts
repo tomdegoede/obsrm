@@ -2,15 +2,15 @@ import {Injector, Inject, Injectable} from "@angular/core";
 import {
   AngularFire, FirebaseRef, FirebaseDatabase, FirebaseListObservable,
   FirebaseObjectObservable
-} from 'angularfire2/angularfire2';
+} from 'angularfire2';
 import {Observable} from "rxjs";
 
 import {BaseModel} from "../base_model";
 import {ModelCollectionObservable} from "../model_collection.interface";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseConnection} from '../database.connection';
-import {isString, isArray} from '@angular/core/src/facade/lang';
-import {Relation, ModelService} from '../model.service';
+import {isString, isArray} from "../lang";
+import {ModelService} from '../model.service';
 import {ModelServiceRef} from "../tokens";
 import {MultiLocationUpdate} from './multi_location_update';
 

@@ -7,7 +7,7 @@ import {ModelServiceRef} from "../tokens";
 import {Observable, BehaviorSubject} from 'rxjs';
 import {ModelCollectionObservable} from '../model_collection.interface';
 import {HorizonCollection} from "./horizon_collection";
-import {isString} from '@angular/core/src/facade/lang';
+import {isString} from "../lang";
 
 @Injectable()
 export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
