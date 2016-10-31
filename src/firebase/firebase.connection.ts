@@ -12,6 +12,7 @@ import {isString, isArray} from "../lang";
 import {ModelService} from '../model.service';
 import {ModelServiceRef} from "../tokens";
 import {MultiLocationUpdate} from './multi_location_update';
+import {ThenableReference} from './thenable_reference';
 
 @Injectable()
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
@@ -178,8 +179,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   updateOrCreate(obj:{}, key?:string):Promise<any> {
     if (key) {
       let child = this.child(key).child('p');
-      return <Promise<any>>
-        Object.assign(child, child.set(obj));
+      return new ThenableReference(child.set(obj), child);
     }
 
     return this.list_ref.push({
