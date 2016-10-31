@@ -30,7 +30,7 @@ export abstract class DatabaseConnection<T extends BaseModel<T>> {
 
   abstract hasOne(model: BaseModel<T>, related: string, call: string);
 
-  abstract updateOrCreate(obj:{}, key?:any): Promise<any>;
+  abstract updateOrCreate(obj:{}, key?:any): Promise<T>;
 
   abstract key(model: T): any;
 

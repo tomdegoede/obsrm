@@ -176,14 +176,22 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
-  updateOrCreate(obj:{}, key?:string):Promise<any> {
+  updateOrCreate(obj:{}, key?:string):Promise<T> {
+    let ref;
+
     if (key) {
-      let child = this.child(key).child('p');
-      return new ThenableReference(child.set(obj), child);
+      let child = this.child(key);
+      ref = new ThenableReference(child.child('p').set(obj), child);
+    } else {
+      ref = this.list_ref.push({
+        p: obj
+      });
     }
 
-    return this.list_ref.push({
-      p: obj
+    return ref.then((v) => {
+      let instance = this.newInstance();
+      instance.setSource(ref);
+      return instance;
     });
   }
 }
