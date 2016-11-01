@@ -32,5 +32,5 @@
     "build": "tsc",
     "postbuild": "cp package.json dist"
   },
-  "version": "0.1.7"
+  "version": "0.1.8"
 }

@@ -6,7 +6,6 @@ import {ModelCollectionObservable} from "../model_collection.interface";
 import {DatabaseConnection} from '../database.connection';
 import {FirebaseConnection} from './firebase.connection';
 import {MultiLocationUpdate} from './multi_location_update';
-import {ThenableReference} from './thenable_reference';
 
 export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
@@ -115,24 +114,16 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
 
     // Pushing undefined will not require rollback but will create a key
     let ref = key ? this.__ref.child(key) : super.push(undefined);
-
     let related_ref = related.list_ref.child(ref.key).child('p');
-
-    // Set true for own collection
-    upd.add(ref, true);
 
     // Add val to properties
     upd.add(related_ref, val);
 
-    // Add reverse relation key to new model
-    if(this.other_key) {
-      let relation_ref = related
-        .child(`${ref.key}/r/${this.other_key}/${this.model.key()}`);
+    upd.add(
+      this.link([ref.key])
+    );
 
-      upd.add(relation_ref, true);
-    }
-
-    upd.update();
+    upd.subscribe();
 
     return new Promise((done) => {
       let instance = this.related.newInstance();
@@ -143,5 +134,23 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
 
   remove(key: string) {
     return this.__ref.child(key).remove();
+  }
+
+  link(keys: string[]): MultiLocationUpdate {
+    let upd = new MultiLocationUpdate(this.__ref.root);
+    let related: FirebaseConnection<T> = <FirebaseConnection<T>>this.related;
+
+    keys.forEach(key => {
+      upd.add(this.__ref.child(key), true);
+
+      if(this.other_key) {
+        let relation_ref = related
+          .child(`${key}/r/${this.other_key}/${this.model.key()}`);
+
+        upd.add(relation_ref, true);
+      }
+    });
+
+    return upd;
   }
 }

@@ -93,6 +93,9 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
     let deletes: Observable<firebase.database.Reference[]>[] = model.getRelations().map(relation => {
       return model.r[relation.call].take(1).map(related => {
+        if(!related) {
+          return;
+        }
 
         // Call delete on child incase it needs to be deleted.
         // Separate MultiLocationUpdate creation to a separate function so we can combine a child deletion with this deletion
@@ -111,20 +114,16 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
       });
     });
 
-    let related_refs = Observable.combineLatest(...deletes)
-      .map((refs: firebase.database.Reference[][]) => {
-        return refs.reduce((total, refs) => {
-          return total.concat(refs);
-        }, []);
-      });
+    Observable.combineLatest(...deletes)
+      .map(refs => [].concat(...refs).filter(ref => ref))
+      .take(1)
+      .subscribe(refs => {
+        refs.map(ref => {
+          upd.add(ref, null);
+        });
 
-    related_refs.take(1).subscribe(refs => {
-      refs.map(ref => {
-        upd.add(ref, null);
+        upd.subscribe();
       });
-
-      upd.update();
-    });
   }
 
   static getRef(model:BaseModel<any>):firebase.database.Reference {
