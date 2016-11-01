@@ -144,7 +144,7 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
     });
   }
 
-  link(keys: string[]) {
-
+  link(keys: string[]): Observable<any> {
+    return null;
   }
 }
