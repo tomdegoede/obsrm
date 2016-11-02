@@ -104,18 +104,20 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     this.source = this.service.newObservable(this.typed);
 
     // TODO cleaner way to process relations
-    this.relation_objects = this.getRelations().reduce<{[key:string]:RelationObservable}>((relation_objects, relation) => {
-      switch (relation.type) {
-        case 'one':
-          relation_objects[relation.call] = this.hasOne(relation);
-          break;
-        case 'many':
-          relation_objects[relation.call] = this.hasMany(this.ms.model<any>(relation.related), relation.reverse.call, relation.call);
-          break;
-      }
+    this.relation_objects = this.getRelations()
+      .filter(relation => relation.call)
+      .reduce<{[key:string]:RelationObservable}>((relation_objects, relation) => {
+        switch (relation.type) {
+          case 'one':
+            relation_objects[relation.call] = this.hasOne(relation);
+            break;
+          case 'many':
+            relation_objects[relation.call] = this.hasMany(this.ms.model<any>(relation.related), relation.reverse.call, relation.call);
+            break;
+        }
 
-      return relation_objects;
-    }, {});
+        return relation_objects;
+      }, {});
 
     return this.typed;
   }
