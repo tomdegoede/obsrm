@@ -61,7 +61,7 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
-  hasOne<R>(model: BaseModel<T>, relation: Relation): HasOne<R> {
+  hasOne<R extends BaseModel<any>>(model: BaseModel<T>, relation: Relation): HasOne<R> {
 
     let source = this.database().object(
       FirebaseConnection.getRef(model).child(`r/${relation.call}`)
@@ -181,22 +181,17 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     );
   }
 
-  updateOrCreate(obj:{}, key?:string):Promise<T> {
-    let ref;
-
-    if (key) {
-      let child = this.child(key);
-      ref = new ThenableReference(child.child('p').set(obj), child);
-    } else {
-      ref = this.list_ref.push({
-        p: obj
-      });
+  updateOrCreate(obj:{}, key?:string): Observable<T> {
+    if(!key) {
+      key = this.list_ref.push().key;
     }
 
-    return ref.then((v) => {
-      let instance = this.newInstance();
-      instance.setSource(ref);
-      return instance;
-    });
+    let instance = this.newInstance();
+    instance.setSource(this.list_ref.child(key));
+
+    let upd = new MultiLocationUpdate(this.ref.database().ref(), instance);
+    upd.add(this.child(`${key}/p`), obj);
+
+    return upd;
   }
 }
