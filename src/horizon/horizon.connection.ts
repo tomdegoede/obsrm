@@ -2,12 +2,13 @@ import {Injector, Inject, Injectable} from "@angular/core";
 
 import {BaseModel} from "../base_model";
 import {DatabaseConnection} from '../database.connection';
-import {ModelService} from '../model.service';
+import {ModelService, Relation} from '../model.service';
 import {ModelServiceRef} from "../tokens";
 import {Observable, BehaviorSubject} from 'rxjs';
-import {ModelCollectionObservable} from '../model_collection.interface';
+import {HasMany} from '../interface/has_many.interface';
 import {HorizonCollection} from "./horizon_collection";
 import {isString} from "../lang";
+import {HasOne} from '../interface/has_one.interface';
 
 @Injectable()
 export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
@@ -69,11 +70,11 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
     });
   }
 
-  hasMany<R extends BaseModel<R>>(model: BaseModel<T>, related: DatabaseConnection<R>, other_key: string, local_index?: string): ModelCollectionObservable<R> {
+  hasMany<R extends BaseModel<R>>(model: BaseModel<T>, related: DatabaseConnection<R>, other_key: string, local_index?: string): HasMany<R> {
     return new HorizonCollection(model, <HorizonConnection<R>>related, other_key, local_index);
   }
 
-  hasOne(model: BaseModel<T>, related: string, call: string) {
+  hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation): HasOne<R> {
     throw "TODO implement hasOne for Horizon OBSRM";
   }
 

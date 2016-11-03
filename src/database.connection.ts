@@ -1,10 +1,11 @@
-import {ModelCollectionObservable} from './model_collection.interface';
+import {HasMany} from './interface/has_many.interface';
 import {BaseModel} from './base_model';
 import {Inject, Injector} from "@angular/core";
 import {Observable} from 'rxjs/Rx';
 import {inject} from './helpers/inject';
-import {ModelService} from './model.service';
+import {ModelService, Relation} from './model.service';
 import {ModelServiceRef} from "./tokens";
+import {HasOne} from './interface/has_one.interface';
 
 export abstract class DatabaseConnection<T extends BaseModel<T>> {
 
@@ -26,9 +27,9 @@ export abstract class DatabaseConnection<T extends BaseModel<T>> {
     model: BaseModel<T>,
     related: DatabaseConnection<R>,
     other_key: string,
-    local_index?: string): ModelCollectionObservable<R>;
+    local_index?: string): HasMany<R>;
 
-  abstract hasOne(model: BaseModel<T>, related: string, call: string);
+  abstract hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation): HasOne<R>;
 
   abstract updateOrCreate(obj:{}, key?:any): Promise<T>;
 

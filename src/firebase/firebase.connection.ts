@@ -5,14 +5,16 @@ import {
 import {Observable} from "rxjs";
 
 import {BaseModel} from "../base_model";
-import {ModelCollectionObservable} from "../model_collection.interface";
+import {HasMany} from "../interface/has_many.interface";
 import {FirebaseCollection} from './firebase_collection';
 import {DatabaseConnection} from '../database.connection';
 import {isString, isArray} from "../lang";
-import {ModelService} from '../model.service';
+import {ModelService, Relation} from '../model.service';
 import {ModelServiceRef} from "../tokens";
 import {MultiLocationUpdate} from './multi_location_update';
 import {ThenableReference} from './thenable_reference';
+import {HasOne} from '../interface/has_one.interface';
+import {FirebaseHasOne} from './has_one';
 
 @Injectable()
 export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnection<T> {
@@ -55,13 +57,14 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
   hasMany<R extends BaseModel<R>>(model:BaseModel<T>,
                                   related:DatabaseConnection<R>,
                                   other_key:string,
-                                  local_index?:string):ModelCollectionObservable<R> {
+                                  local_index?:string):HasMany<R> {
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
-  hasOne(model: BaseModel<T>, related: string, call: string): Observable<BaseModel<any>> {
-    return this.database().object(
-      FirebaseConnection.getRef(model).child(`r/${call}`)
+  hasOne<R>(model: BaseModel<T>, relation: Relation): HasOne<R> {
+
+    let source = this.database().object(
+      FirebaseConnection.getRef(model).child(`r/${relation.call}`)
     ).map(model => {
       model = FirebaseConnection.processProperties(model);
 
@@ -71,9 +74,12 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
         return Observable.from([null]);
       }
 
-      return this.ms.model<any>(related)
+      return this.ms.model<any>(relation.related)
         .get(keys[0]);
     }).switch();
+
+
+    return new FirebaseHasOne<R>(source, model, relation);
   }
 
   key(model:T):any {

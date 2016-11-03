@@ -1,9 +1,9 @@
 import {BaseModel} from '../base_model';
-import {ModelCollectionObservable} from "../model_collection.interface";
+import {HasMany} from "../interface/has_many.interface";
 import {HorizonConnection} from './horizon.connection';
 import {Observable} from 'rxjs';
 
-export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> implements ModelCollectionObservable<T> {
+export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> implements HasMany<T> {
 
   protected _cache: {[key:string]:T} = {};
   protected value: T[] = [];

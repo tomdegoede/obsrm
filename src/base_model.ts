@@ -2,20 +2,22 @@ import {Observable} from "rxjs";
 import {ModelService, Relation} from './model.service';
 import {ModelServiceRef} from "./tokens";
 import {DatabaseConnection} from './database.connection';
-import {ModelCollectionObservable} from './model_collection.interface';
+import {HasMany} from './interface/has_many.interface';
 import {Inject} from '@angular/core';
+import {HasOne} from './interface/has_one.interface';
+import {Has} from './interface/has.interface';
 
-export type RelationObservable = ModelCollectionObservable<any> | BaseModel<any>;// | Observable<any>;
+export type RelationMap = {[key:string]:Has<any>};
 
 // TODO separate relations & properties for FireBase storage
 export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   protected relations: Relation[] = [];
-  protected relation_objects: {[key:string]:RelationObservable} = {};
+  protected relation_objects: RelationMap = {};
   protected properties: {[key:string]:any} = {};
   source_object: any;
 
-  constructor(@Inject(ModelServiceRef) protected ms:ModelService, protected _path: string) {
+  constructor(@Inject(ModelServiceRef) public ms:ModelService, protected _path: string) {
     super();
     this.relations = this.ms.getRelations(this.path());
   }
@@ -30,7 +32,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   }
 
   // TODO more genericly typed
-  get r(): {[key:string]:RelationObservable} {
+  get r(): RelationMap {
     return this.relation_objects;
   }
 
@@ -42,7 +44,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return this.relation_objects[key];
   }
 
-  getManyRelation(key): ModelCollectionObservable<any> {
+  getManyRelation(key): HasMany<any> {
     let relation = this.ms.getRelation(this.path(), key);
 
     if(relation) {
@@ -53,10 +55,10 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
       console.warn(`Calling getManyRelation ${key} on ${this.path()} but the relation is not defined`);
     }
 
-    return <ModelCollectionObservable<any>>this.getRelation(key);
+    return <HasMany<any>>this.getRelation(key);
   }
 
-  getOneRelation(key): Observable<BaseModel<any>> {
+  getOneRelation(key): HasOne<any> {
     let relation = this.ms.getRelation(this.path(), key);
 
     if(relation) {
@@ -67,7 +69,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
       console.warn(`Calling getOneRelation ${key} on ${this.path()} but the relation is not defined`);
     }
 
-    return <BaseModel<any>>this.getRelation(key);
+    return <HasOne<any>>this.getRelation(key);
   }
 
   public getRelations(): Relation[] {
@@ -106,7 +108,7 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     // TODO cleaner way to process relations
     this.relation_objects = this.getRelations()
       .filter(relation => relation.call)
-      .reduce<{[key:string]:RelationObservable}>((relation_objects, relation) => {
+      .reduce<RelationMap>((relation_objects, relation) => {
         switch (relation.type) {
           case 'one':
             relation_objects[relation.call] = this.hasOne(relation);
@@ -130,12 +132,12 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
   hasMany<R extends BaseModel<R>>(
     related: DatabaseConnection<R>,
     other_key: string,
-    local_index?: string): ModelCollectionObservable<R> {
+    local_index?: string): HasMany<R> {
     return this.service.hasMany<R>(this, related, other_key, local_index);
   }
 
-  hasOne(relation: Relation) {
-    return this.service.hasOne(this, relation.related, relation.call);
+  hasOne<R extends BaseModel<R>>(relation: Relation): HasOne<R> {
+    return this.service.hasOne<R>(this, relation);
   }
 
   save() {

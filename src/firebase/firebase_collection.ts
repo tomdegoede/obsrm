@@ -2,12 +2,13 @@ import {Observable} from 'rxjs/Observable';
 import {Operator} from 'rxjs/Operator';
 import {FirebaseListFactory, FirebaseListObservable} from 'angularfire2';
 import {BaseModel} from '../base_model';
-import {ModelCollectionObservable} from "../model_collection.interface";
+import {HasMany} from "../interface/has_many.interface";
 import {DatabaseConnection} from '../database.connection';
 import {FirebaseConnection} from './firebase.connection';
 import {MultiLocationUpdate} from './multi_location_update';
+import {isString} from '../lang';
 
-export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements ModelCollectionObservable<T> {
+export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObservable<T[]> implements HasMany<T> {
   // Cant use _ref because super is using it. Super should declare it protected.
   protected __ref: firebase.database.Reference;
   protected __query: firebase.database.Reference|firebase.database.Query;
@@ -136,7 +137,11 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return this.__ref.child(key).remove();
   }
 
-  link(keys: string[]): MultiLocationUpdate {
+  link(keys: string|string[]): MultiLocationUpdate {
+    if(isString(keys)) {
+      keys = [<string>keys];
+    }
+
     let upd = new MultiLocationUpdate(this.__ref.root);
     let related: FirebaseConnection<T> = <FirebaseConnection<T>>this.related;
 
