@@ -13,5 +13,5 @@ export interface HasMany<T extends BaseModel<any>> extends Has<T[]> {
   getFirst(): Promise<T>;
   link(keys: string|string[]): Observable<any>;
 
-  all();
+  all(): Observable<T[]>;
 }

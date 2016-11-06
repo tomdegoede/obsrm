@@ -220,9 +220,15 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return upd;
   }
 
-  all() {
+  all(): Observable<T[]> {
     return this
-      .map(collection => Observable.combineLatest(...collection))
+      .map(collection => {
+        if(!collection.length) {
+          return Observable.from([[]]);
+        }
+
+        return Observable.combineLatest(...collection);
+      })
       .switch();
   }
 }
