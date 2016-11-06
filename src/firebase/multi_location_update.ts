@@ -5,7 +5,7 @@ import {root} from "rxjs/util/root";
 export class MultiLocationUpdate extends Observable<any> {
   private data = {};
 
-  constructor(private root: firebase.database.Reference, private resolve_value?) {
+  constructor(private root: firebase.database.Reference, public resolve_value?) {
     super();
   }
 
