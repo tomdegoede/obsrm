@@ -30,6 +30,7 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc",
+    "build:watch": "tsc -w",
     "postbuild": "cp package.json dist"
   },
   "version": "0.2.1"
