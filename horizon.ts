@@ -1,0 +1,1 @@
+export {ngProvideHorizonConnection} from "./src/horizon";
