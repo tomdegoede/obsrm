@@ -61,7 +61,11 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
     return new FirebaseCollection<R>(model, related, other_key, local_index);
   }
 
-  hasOne<R extends BaseModel<any>>(model: BaseModel<T>, relation: Relation): HasOne<R> {
+  hasOne<R extends BaseModel<any>>(model: BaseModel<T>, relation: Relation, set_related?: BaseModel<any>): HasOne<R> {
+
+    if(set_related) {
+      return new FirebaseHasOne<R>(set_related, model, relation);
+    }
 
     let source = this.database().object(
       FirebaseConnection.getRef(model).child(`r/${relation.call}`)

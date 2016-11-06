@@ -136,8 +136,8 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return this.service.hasMany<R>(this, related, other_key, local_index);
   }
 
-  hasOne<R extends BaseModel<R>>(relation: Relation): HasOne<R> {
-    return this.service.hasOne<R>(this, relation);
+  hasOne<R extends BaseModel<R>>(relation: Relation, set_related?: BaseModel<any>): HasOne<R> {
+    return this.service.hasOne<R>(this, relation, set_related);
   }
 
   save() {
@@ -146,5 +146,23 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
 
   delete() {
     return this.service.delete(this.typed);
+  }
+
+  computedRelations(): {[key: string]: Observable<BaseModel<any>>} {
+      return {};
+  }
+
+  setRelation(call, related: BaseModel<any>) {
+      let relation = this.ms.getRelation(this.path(), call);
+
+    switch (relation.type) {
+      case 'one':
+        this.relation_objects[relation.call] = this.hasOne(relation, related);
+        break;
+      case 'many':
+        // throw new Error("TODO implement setRelation from MasMany relations");
+        // this.relation_objects[relation.call] = this.hasMany(this.ms.model<any>(relation.related), relation.reverse.call, relation.call);
+        break;
+    }
   }
 }

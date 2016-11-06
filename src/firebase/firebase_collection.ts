@@ -124,13 +124,74 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
       this.link([ref.key])
     );
 
-    upd.subscribe();
+    let instance = this.related.newInstance();
+    instance.setSource(related_ref.parent);
+    instance.setProperties(val);
 
-    return new Promise((done) => {
-      let instance = this.related.newInstance();
-      instance.setSource(related_ref.parent);
-      done(instance);
-    });
+    // Set the reverse relation so we can call computedRelations on it
+    if(this.other_key) {
+      instance.setRelation(this.other_key, this.model);
+    }
+
+    return this.computedRelationsStatement(instance)
+      .map(computed => {
+        if(computed instanceof MultiLocationUpdate) {
+          upd.add(computed);
+        } else if(computed instanceof Observable) {
+          return Observable.combineLatest(upd, computed);
+        }
+
+        return upd;
+      })
+      .switch()
+      .toPromise()
+      .then(v => instance); // Always return the instance
+  }
+
+  computedRelationsStatement(instance: BaseModel<any>): Observable<MultiLocationUpdate|Observable<any>> {
+    let computed = instance.computedRelations();
+
+    let keys = [];
+    let observables: Observable<BaseModel<any>>[] = [];
+
+    for(let i in computed) {
+      keys.push(i);
+      observables.push(computed[i]);
+    }
+
+    if(!keys.length) {
+      return Observable.from([null]);
+    }
+
+    return Observable.combineLatest(...observables)
+      .map((v: BaseModel<any>[]) => {
+        let upd = new MultiLocationUpdate(this.__ref.root);
+        let non_firebase_statements = [];
+
+        keys.forEach((key, i) => {
+          // Return if there's nothing to link
+          if(!v[i]) {
+            return;
+          }
+
+          let link_statement = instance.getRelation(key).link(
+            v[i].key()
+          );
+
+          if(link_statement instanceof MultiLocationUpdate) {
+            upd.add(link_statement);
+          } else {
+            non_firebase_statements.push(link_statement);
+          }
+        });
+
+        // Prefer MultiLocationUpdate return
+        if(!non_firebase_statements.length) {
+          return upd;
+        }
+
+        return Observable.combineLatest(upd, ...non_firebase_statements);
+      }).take(1);
   }
 
   remove(key: string) {

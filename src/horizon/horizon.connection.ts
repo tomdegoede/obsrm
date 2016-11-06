@@ -74,7 +74,7 @@ export class HorizonConnection<T extends BaseModel<T>> extends DatabaseConnectio
     return new HorizonCollection(model, <HorizonConnection<R>>related, other_key, local_index);
   }
 
-  hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation): HasOne<R> {
+  hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation, set_related?: BaseModel<any>): HasOne<R> {
     throw "TODO implement hasOne for Horizon OBSRM";
   }
 

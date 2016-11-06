@@ -29,7 +29,7 @@ export abstract class DatabaseConnection<T extends BaseModel<T>> {
     other_key: string,
     local_index?: string): HasMany<R>;
 
-  abstract hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation): HasOne<R>;
+  abstract hasOne<R extends BaseModel<R>>(model: BaseModel<T>, relation: Relation, set_related?: BaseModel<any>): HasOne<R>;
 
   abstract updateOrCreate(obj:{}, key?:any): Observable<T>;
 
