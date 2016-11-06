@@ -148,6 +148,9 @@ export class BaseModel<T extends BaseModel<T>> extends Observable<T | any> {
     return this.service.delete(this.typed);
   }
 
+  // IDEA: record relation steps down so we know that if they change we should update.
+  // we know reverse for parent so if a parent (in this case also a task) changes it's organization relation
+  // we can loop it's reverse parent, which is children and cal computedRelations using the new org
   computedRelations(): {[key: string]: Observable<BaseModel<any>>} {
       return {};
   }

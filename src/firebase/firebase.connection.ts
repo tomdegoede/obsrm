@@ -101,28 +101,30 @@ export class FirebaseConnection<T extends BaseModel<T>> extends DatabaseConnecti
 
     upd.add(FirebaseConnection.getRef(model), null);
 
-    let deletes: Observable<firebase.database.Reference[]>[] = model.getRelations().map(relation => {
-      return model.r[relation.call].take(1).map(related => {
-        if(!related) {
-          return;
-        }
+    let deletes: Observable<firebase.database.Reference[]>[] = model.getRelations()
+      .filter(relation => relation.reverse.call)
+      .map(relation => {
+        return model.r[relation.call].take(1).map(related => {
+          if(!related) {
+            return;
+          }
 
-        // Call delete on child incase it needs to be deleted.
-        // Separate MultiLocationUpdate creation to a separate function so we can combine a child deletion with this deletion
+          // Call delete on child incase it needs to be deleted.
+          // Separate MultiLocationUpdate creation to a separate function so we can combine a child deletion with this deletion
 
-        if(isArray(related)) {
+          if(related instanceof BaseModel) {
+            related = [related];
+          }
+
+          if(!isArray(related)) {
+            throw "Unknown relation value." + JSON.stringify(related);
+          }
+
           return related.map(related_model => {
             return FirebaseConnection.getRef(related_model).child('r').child(relation.reverse.call).child(model.key());
           });
-        } else if(related instanceof BaseModel) {
-          return [
-            FirebaseConnection.getRef(related).child('r').child(relation.reverse.call).child(model.key())
-          ];
-        } else {
-          throw "Unknown relation value." + JSON.stringify(related);
-        }
+        });
       });
-    });
 
     Observable.combineLatest(...deletes)
       .map(refs => [].concat(...refs).filter(ref => ref))
