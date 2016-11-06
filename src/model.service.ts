@@ -19,7 +19,7 @@ export class ModelService {
   constructor(protected injector:Injector, @Inject(ModelsConfig) protected models_config) {
     // 1.2 <3> 4.5
     this.relation_pairs = models_config.relations.map(relation => {
-      return relation.match(/([^\.\s]+)\.([^\.\s]+)\s*(\<?\>?|=)\s*([^\.\s]+)(\.([^\.\s]+))?/);
+      return relation.match(/([^\.\s]+)\.([^\.\s]+)\s*(\<\>|\<|\>|=)\s*([^\.\s]+)(\.([^\.\s]+))?/);
     }).filter(r => !!r).map(relation => {
       let left: Relation = {
         model: relation[1],

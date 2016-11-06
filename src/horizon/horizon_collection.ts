@@ -147,4 +147,8 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
   link(keys: string[]): Observable<any> {
     return null;
   }
+
+  all() {
+    throw new Error("TODO implement all for horizon_collection");
+  }
 }

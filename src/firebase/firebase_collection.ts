@@ -158,4 +158,10 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
 
     return upd;
   }
+
+  all() {
+    return this
+      .map(collection => Observable.combineLatest(...collection))
+      .switch();
+  }
 }
