@@ -52,6 +52,7 @@ export class FirebaseHasOne<T extends BaseModel<any>> extends Observable<T> impl
 
       // TODO prevent infinite recursion by only calling reverse once
       // Use link inside the collection method after this
+      // TODO way of merging update statements
 
       // Merge upd statements for atomic Firebase update when they both originate from firebase connections
       if(reverse instanceof MultiLocationUpdate) {

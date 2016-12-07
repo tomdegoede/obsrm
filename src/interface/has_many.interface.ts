@@ -14,4 +14,10 @@ export interface HasMany<T extends BaseModel<any>> extends Has<T[]> {
   link(keys: string|string[]): Observable<any>;
 
   all(): Observable<T[]>;
+
+  /**
+   * Listen for new records
+   * @param after_key return records after given key
+   */
+  tail(after_key?:string): Observable<T>;
 }

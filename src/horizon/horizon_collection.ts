@@ -151,4 +151,8 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
   all(): Observable<T[]> {
     throw new Error("TODO implement all for horizon_collection");
   }
+
+  tail(after_key?: string): Observable<T> {
+    throw new Error("TODO implement tail for horizon_collection");
+  }
 }

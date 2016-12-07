@@ -231,4 +231,35 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
       })
       .switch();
   }
+
+  tail(after_key?: string): Observable<T> {
+    return new Observable<T>((subscriber) => {
+      let addfn = this.__ref.orderByKey().startAt(
+        getCurrentPushIDPrefix()
+      ).on("child_added", snapshot => {
+        subscriber.next(
+          this.related.get(snapshot.key)
+        );
+      });
+
+      return () => {
+        this.__ref.off('child_added', addfn);
+      };
+    });
+  }
+}
+
+// source: pushid package
+function getCurrentPushIDPrefix() {
+  var PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+  var now = new Date().getTime();
+
+  var timeStampChars = new Array(8);
+  for (var i = 7; i >= 0; i--) {
+    timeStampChars[i] = PUSH_CHARS.charAt(now % 64);
+    // NOTE: Can't use << here because javascript will convert to int and lose the upper bits.
+    now = Math.floor(now / 64);
+  }
+
+  return timeStampChars.join('');
 }
