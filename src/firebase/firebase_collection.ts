@@ -14,6 +14,8 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
   protected __query: firebase.database.Reference|firebase.database.Query;
   protected _cache: {[key:string]:T} = {};
 
+  protected value: T[] = [];
+
   constructor(
     protected model:BaseModel<any>,
     protected related:DatabaseConnection<T>,
@@ -34,6 +36,19 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
 
     this.source = FirebaseListFactory(this.__query)
       .map(collection => this.processCollection(collection));
+  }
+
+  splice(index, howmany, ...items: T[]) {
+    let r = this.value.splice(index, howmany, ...items);
+
+    // TODO join updates & unlink into single multi loc update
+    items.filter(v => v).forEach(item => this.updateOrPush(item.p, item.key()));
+
+    this.unlink(
+      r.map(v => v.key())
+    ).subscribe();
+
+    return r;
   }
 
   where(where: {[key:string]:any}): FirebaseCollection<T> {
@@ -67,7 +82,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
       return item.$value;
     });
 
-    let ret = collection.map(
+    this.value = collection.map(
       item => {
         keys[item.$key] = true;
         return this._cache[item.$key] = this._cache[item.$key] || this.related.get(item.$key);
@@ -80,7 +95,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
       .filter(k => !keys[k])
       .forEach(k => delete this._cache[k]);
 
-    return ret;
+    return this.value;
   }
 
   once(): Promise<T[]> {
@@ -198,7 +213,7 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     return this.__ref.child(key).remove();
   }
 
-  link(keys: string|string[]): MultiLocationUpdate {
+  private setLink(keys: string|string[], value): MultiLocationUpdate {
     if(isString(keys)) {
       keys = [<string>keys];
     }
@@ -207,17 +222,25 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     let related: FirebaseConnection<T> = <FirebaseConnection<T>>this.related;
 
     keys.forEach(key => {
-      upd.add(this.__ref.child(key), true);
+      upd.add(this.__ref.child(key), value);
 
       if(this.other_key) {
         let relation_ref = related
           .child(`${key}/r/${this.other_key}/${this.model.key()}`);
 
-        upd.add(relation_ref, true);
+        upd.add(relation_ref, value);
       }
     });
 
     return upd;
+  }
+
+  link(keys: string|string[]): MultiLocationUpdate {
+    return this.setLink(keys, true);
+  }
+
+  unlink(keys: string|string[]): MultiLocationUpdate {
+    return this.setLink(keys, false);
   }
 
   all(): Observable<T[]> {
