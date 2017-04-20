@@ -22,6 +22,10 @@ export class HorizonCollection<T extends BaseModel<T>> extends Observable<T[]> i
       .map(collection => this.processCollection(collection)).share();
   }
 
+  createChild(source: Observable<T[]>): HasMany<T> {
+    return null;
+  }
+
   where(where: {[key:string]:any}): HorizonCollection<T> {
     let w = this.wheres;
 
