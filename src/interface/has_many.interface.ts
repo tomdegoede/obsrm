@@ -14,7 +14,7 @@ export interface HasMany<T extends BaseModel<any>> extends Has<T[]> {
   link(keys: string|string[]): Observable<any>;
 
   all(): Observable<T[]>;
-  splice(index, howmany, ...items: T[]);
+  splice(index, howmany, ...items: T[]): T[];
 
   /**
    * Listen for new records

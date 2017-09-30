@@ -147,10 +147,11 @@ export class FirebaseCollection<T extends BaseModel<T>> extends FirebaseListObse
     );
 
     // Delete all missing keys from the cache
-    Object
-      .keys(this._cache)
-      .filter(k => !keys[k])
-      .forEach(k => delete this._cache[k]);
+    // TODO clear on next tick
+    // Object
+    //   .keys(this._cache)
+    //   .filter(k => !keys[k])
+    //   .forEach(k => delete this._cache[k]);
 
     return this.value;
   }
